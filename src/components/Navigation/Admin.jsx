@@ -1,7 +1,21 @@
 import { NavLink } from "react-router-dom";
+import { dLogout } from "../../http";
+import { setAuth } from "../../store/auth-slice";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 const Admin = () =>
 {
+const dispatch = useDispatch();
+  const history = useHistory();
+
+  const logout = async () =>
+    {
+        await dLogout();
+        dispatch(setAuth(null))
+        return history.push('/login');
+    }
+
     return(
         <ul className="sidebar-menu">
         <li><NavLink className="nav-link" to="/home"><i className="fas fa-home"></i> <span>Dashboard</span></NavLink></li>
@@ -23,7 +37,7 @@ const Admin = () =>
         <li className="menu-header">Settings</li>
         <li><NavLink className="nav-link" to="/contact"><i className="fab fa-teamspeak"></i> <span>Contact Us</span></NavLink></li>
         <li><NavLink className="nav-link" to="/about"><i className="fas fa-info-circle"></i> <span>About Us</span></NavLink></li>
-        <li><NavLink className="nav-link" to="/home"><i className="fas fa-sign-out-alt"></i> <span>Logout</span></NavLink></li>
+        <li><NavLink onClick={logout} className="nav-link" to="/home"><i className="fas fa-sign-out-alt"></i> <span>Logout</span></NavLink></li>
       </ul>
     )
 }
