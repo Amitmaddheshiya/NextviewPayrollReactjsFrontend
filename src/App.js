@@ -43,6 +43,7 @@ import LeaveView from './components/Admin/LeaveView';
 import Leave from './components/Admin/Leave';
 import AssignSalary from './components/Admin/AssignSalary';
 import Salaries from './components/Admin/Salaries';
+import MonthlySalaries from './components/Admin/MonthlySalaries';
 import SalaryView from './components/Admin/Salary';
 
 
@@ -120,6 +121,9 @@ const App = () =>
       </AdminRoute>
       <AdminRoute exact path='/salaries'>
         <Salaries/>
+      </AdminRoute>
+      <AdminRoute exact path='/monthlysalaries'>
+        <MonthlySalaries/>
       </AdminRoute>
       <AdminRoute exact path='/leaves/:id'>
         <Leave/>

@@ -1,208 +1,179 @@
 import React, { useEffect, useState } from 'react'
-import { getAttendance, getEmployees, getLeaders } from '../../http';
+import { getAttendance, getEmployees, getLeaders, getAdmins } from '../../http';
 import Loading from '../Loading';
-
-
-
-
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AttendanceView = () => {
-  const [selectedYear, setSelectedYear] = useState('');
-  const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedDay, setSelectedDay] = useState('');
-  const [attendance, setAttendance] = useState();
-  const [employeeMap, setEmployeeMap] = useState();
-  const [employees, setEmployees] = useState();
-  const [selectedEmployee, setSelectedEmployee] = useState();
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [attendance, setAttendance] = useState(null);
+  const [employeeMap, setEmployeeMap] = useState({});
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [noDataMessage, setNoDataMessage] = useState('');
 
-  const years = [2020,2021,2022, 2023, 2024]; // Customize this as needed
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-  const monthDays = {
-    "January": 31,
-    "February": 28,
-    "March": 31,
-    "April": 30,
-    "May": 31,
-    "June": 30,
-    "July": 31,
-    "August": 31,
-    "September": 30,
-    "October": 31,
-    "November": 30,
-    "December": 31,
-  }
-  const numOfDays = monthDays[selectedMonth];
-  const days = Array.from({ length: numOfDays }, (_, index) => index + 1);
-
-  useEffect(()=>{
+  useEffect(() => {
     const dt = new Date();
     const obj = {
       "year": dt.getFullYear(),
-      "month":dt.getMonth()+1,
-      "date":dt.getDate(),
+      "month": dt.getMonth() + 1,
+      "date": dt.getDate(),
     }
+
     let empObj = {};
+
     const fetchData = async () => {
-      const res = await getAttendance(obj);
-      
-      const {data} = res;
-      console.log(data)
-      setAttendance(data);
-    } 
-    const fetchEmployees = async () => {
-        const emps = await getEmployees();
-        const leaders = await getLeaders();
-        emps.data.forEach(employee => empObj[employee.id] = [employee.name, employee.email]);
-        leaders.data.forEach(leader => empObj[leader.id] = [leader.name, leader.email]);
-        setEmployeeMap(empObj);
-        setEmployees([...emps.data,...leaders.data]);
-        
+      try {
+        const res = await getAttendance(obj);
+        const { data } = res;
+        setAttendance(data);
+        setNoDataMessage(data.length === 0 ? "No attendance records found for today." : "");
+      } catch (error) {
+        console.error(error);
+        setNoDataMessage("Error fetching attendance data.");
+      } finally {
+        setLoading(false);
+      }
     }
+
+    const fetchEmployees = async () => {
+      const emps = await getEmployees();
+      const leaders = await getLeaders();
+      const admins = await getAdmins();
+      emps.data.forEach(employee => empObj[employee.id] = [employee.name, employee.email]);
+      leaders.data.forEach(leader => empObj[leader.id] = [leader.name, leader.email]);
+      admins.data.forEach(admin => empObj[admin.id] = [admin.name, admin.email]);
+      setEmployeeMap(empObj);
+      setEmployees([...emps.data, ...leaders.data, ...admins.data]);
+    }
+
     fetchEmployees();
     fetchData();
-  },[]);
-
-
-
- 
-
+  }, []);
 
   const searchAttendance = async () => {
-      const obj = {};
-      if(selectedEmployee){
-        obj["employeeID"] = selectedEmployee;
-      }
-      if(selectedYear){
-        obj["year"] = selectedYear;
-      }
-      if(selectedMonth){
-        obj["month"] = months.findIndex(month => month===selectedMonth)+1;
-      }
-      if(selectedDay){
-        obj["date"] = selectedDay;
-      }
+    setLoading(true);
+    setNoDataMessage('');
+    const obj = {};
 
-      console.log(obj);
-
-      const res = await getAttendance(obj);
-      const {data} = res;
-      setAttendance(data);
-  }
-  return (
-    <>
-    {
-      attendance? ( <div className="main-content">
-      <section className="section">
-              <div className="card">
-                <div className="card-header d-flex justify-content-between">
-                  <h4>Attendance</h4>
-                  
-                </div>
-              </div>
-        
-        <div className="d-flex justify-content-center w-100">
-  
-        <div className="col">
-          <select
-            className='form-control select2'
-            value={selectedEmployee}
-            onChange={(e) => setSelectedEmployee(e.target.value)}
-          >
-            <option value="">Employees</option>
-            {employees?.map((employee) => (
-              <option key={employee._id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
-        </div>
-         
-         <div className="col">
-          <select
-            className='form-control select2'
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-          >
-            <option value="">Year</option>
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </div>
-  
-        <div className="col">
-          <select
-            className='form-control select2'
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-          >
-            <option value="">Month</option>
-            {months.map((month) => (
-              <option key={month} value={month}>
-                {month}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="col">
-          <select
-          className='form-control select2'
-            value={selectedDay}
-            onChange={(e) => setSelectedDay(e.target.value)}
-          >
-            <option value="">Day</option>
-            {days.map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button onClick={searchAttendance} className="btn btn-lg btn-primary col">Search</button>
-      </div>
-      </section>
-      <div className="table-responsive">
-          <table className="table table-striped table-md center-text">
-              <thead>
-                 <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Date</th>
-                    <th>Day</th>
-                    <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-               {
-  
-                attendance?.map((attendance,idx) => 
-                <tr> 
-                <td>{idx+1}</td> 
-                <td>{employeeMap && employeeMap[attendance.employeeID][0]}</td>
-                <td>{employeeMap && employeeMap[attendance.employeeID][1]}</td>
-                <td>{attendance.date+"/"+attendance.month+"/"+attendance.year}</td>
-                <td>{attendance.day}</td>
-                <td>{attendance.present===true?"Present":""}</td>
-                </tr> 
-                )
-               }            
-              </tbody>
-          </table>
-      </div>
-    </div>)
-    :
-    <Loading/>
+    if (selectedEmployee) {
+      obj["employeeID"] = selectedEmployee;
     }
-    </>
-   
-  )
+
+    if (selectedDate) {
+      obj["year"] = selectedDate.getFullYear();
+      obj["month"] = selectedDate.getMonth() + 1;
+      obj["date"] = selectedDate.getDate();
+    }
+
+    console.log("Searching attendance with:", obj);
+
+    try {
+      const res = await getAttendance(obj);
+      const { data } = res;
+      setAttendance(data);
+
+      if (data.length === 0) {
+        setNoDataMessage("No attendance records found for the selected criteria.");
+      } else {
+        setNoDataMessage('');
+      }
+    } catch (error) {
+      console.error(error);
+      setNoDataMessage("Error fetching attendance data.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  return (
+    <div className="main-content">
+      <section className="section">
+        <div className="card">
+          <div className="card-header d-flex justify-content-between">
+            <h4>Attendance</h4>
+          </div>
+        </div>
+
+        <div className="d-flex justify-content-center w-100 align-items-center mt-3 flex-wrap gap-2">
+
+          {/* Employee Select */}
+          <div className="col-sm-3">
+            <select
+              className='form-control select2'
+              value={selectedEmployee}
+              onChange={(e) => setSelectedEmployee(e.target.value)}
+            >
+              <option value="">Select Employee</option>
+              {employees?.map((employee) => (
+                <option key={employee._id} value={employee.id}>
+                  {employee.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Date Picker */}
+          <div className="col-sm-3">
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              dateFormat="dd/MM/yyyy"
+              className="form-control"
+              placeholderText="Select Date"
+            />
+          </div>
+
+          {/* Search Button */}
+          <button onClick={searchAttendance} className="btn btn-lg btn-primary col-sm-2">
+            Search
+          </button>
+        </div>
+      </section>
+
+      <div className="table-responsive mt-4">
+        {attendance && attendance.length > 0 ? (
+          <table className="table table-striped table-md center-text">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Date</th>
+                <th>Day</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attendance.map((att, idx) => (
+                <tr key={idx}>
+                  <td>{idx + 1}</td>
+                  <td>{employeeMap[att.employeeID]?.[0]}</td>
+                  <td>{employeeMap[att.employeeID]?.[1]}</td>
+                  <td>{`${att.date}/${att.month}/${att.year}`}</td>
+                  <td>{att.day}</td>
+                  <td>
+                    <span className={`badge ${att.present ? "badge-success" : "badge-danger"}`}>
+                      {att.present ? "Present" : "Absent"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center py-5">
+            <h5 className="text-muted">{noDataMessage || "No attendance data available."}</h5>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default AttendanceView;

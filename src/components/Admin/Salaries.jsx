@@ -1,124 +1,119 @@
-import React, { useEffect, useState } from 'react'
-import { getEmployees, getLeaders, viewAllSalaries } from '../../http';
+import React, { useEffect, useState } from 'react';
+import { viewAllSalaries } from '../../http';
 import { useHistory } from "react-router-dom";
 import Loading from '../Loading';
 
-
 const Salaries = () => {
-  
   const history = useHistory();
-  const [employees, setEmployees] = useState();
-  const [employeeMap, setEmployeeMap] = useState();
-  const [selectedEmployee, setSelectedEmployee] = useState();
-  const [salaries, setSalaries] = useState();
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [salaries, setSalaries] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-    let empObj = {};
-    const fetchData = async () => {
-      const res = await viewAllSalaries({});
-      const {data} = res;
-      setSalaries(data);
+  // ✅ Fetch all salaries (with populated employee details)
+  const fetchSalaries = async (filter = {}) => {
+    setLoading(true);
+    try {
+      const res = await viewAllSalaries(filter);
+      if (res?.success) {
+        setSalaries(res.data || []);
+      } else {
+        setSalaries([]);
+      }
+    } catch (err) {
+      console.error(err);
     }
+    setLoading(false);
+  };
 
-    const fetchEmployees = async () => {
-      const emps = await getEmployees();
-      const leaders = await getLeaders();
-      emps.data.forEach(employee => empObj[employee.id] = [employee.name, employee.email]);
-      leaders.data.forEach(leader => empObj[leader.id] = [leader.name, leader.email]);
-      setEmployeeMap(empObj);
-      setEmployees([...emps.data,...leaders.data]);
-    }
+  useEffect(() => {
+    fetchSalaries();
+  }, []);
 
-    fetchData();
-    fetchEmployees();
-
-  },[]);
-
+  // ✅ Filter by selected employee
   const searchSalary = async () => {
-      const obj = {
-        
-      }
+    const filter = {};
+    if (selectedEmployee) {
+      filter.employeeID = selectedEmployee;
+    }
+    await fetchSalaries(filter);
+  };
 
-      if(selectedEmployee){
-        obj["employeeID"] = selectedEmployee;
-      }
-      const res = await viewAllSalaries(obj);
-      const {data} = res;
-      setSalaries(data);
-
-  }
+  if (loading) return <Loading />;
 
   return (
-    <>
-    {
-      salaries?
-      (<div className="main-content">
+    <div className="main-content">
       <section className="section">
-              <div className="card">
-                <div className="card-header d-flex justify-content-between">
-                  <h4>Salaries</h4>
-                </div>
-              </div>
-        
-        <div className="d-flex justify-content-center align-items-center w-100">
-  
-        <div className="form-group col-md-6">
-        <label>Employee</label>
-          <select
-            className='form-control select2'
-            value={selectedEmployee}
-            onChange={(e) => setSelectedEmployee(e.target.value)}
-          >
-            <option value="">Employees</option>
-            {employees?.map((employee) => (
-              <option key={employee._id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
+        <div className="card">
+          <div className="card-header d-flex justify-content-between">
+            <h4>Salaries</h4>
+          </div>
         </div>
-         
-        <button onClick={searchSalary} className="btn btn-lg btn-primary col">Search</button>
-      </div>
-      </section>
-      <div className="table-responsive">
-          <table className="table table-striped table-md center-text">
-              <thead>
-                 <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Salary</th>
-                    <th>Bonus</th>
-                </tr>
-              </thead>
-              
-              <tbody className="sidebar-wrapper">
-               {
-                 salaries?.map((salary,idx) => 
-                 
-                <tr className='hover-effect' onClick={()=>history.push(`salary/${salary._id}`)}> 
-                <td>{idx+1}</td>  
-                <td>{employeeMap && employeeMap[salary.employeeID][0]}</td>
-                <td>{employeeMap && employeeMap[salary.employeeID][1]}</td>
-                <td>{salary.salary}</td>
-                <td>{salary.bonus}</td>
-                </tr>
-               
-                 
-                )
-              }            
-              </tbody>
-          </table>
-      </div>
-    </div>)
-    :
-    <Loading/>
-    }
-    </>
 
-    
-  )
-}
+        {/* Dropdown */}
+        <div className="d-flex justify-content-center align-items-center w-100">
+          <div className="form-group col-md-6">
+            <label>Employee</label>
+            <select
+              className="form-control select2"
+              value={selectedEmployee}
+              onChange={(e) => setSelectedEmployee(e.target.value)}
+            >
+              <option value="">All Employees</option>
+              {salaries?.map(
+                (s, idx) =>
+                  s?.employeeID && (
+                    <option key={idx} value={s.employeeID._id}>
+                      {s.employeeID.name}
+                    </option>
+                  )
+              )}
+            </select>
+          </div>
+          <button onClick={searchSalary} className="btn btn-lg btn-primary col">
+            Search
+          </button>
+        </div>
+      </section>
+
+      {/* Salary Table */}
+      <div className="table-responsive">
+        <table className="table table-striped table-md center-text">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Gross Salary</th>
+              <th>Net Pay</th>
+            </tr>
+          </thead>
+          <tbody>
+            {salaries?.length > 0 ? (
+              salaries.map((salary, idx) => (
+                <tr
+                  key={salary._id || idx}
+                  className="hover-effect"
+                  onClick={() => history.push(`salary/${salary._id}`)}
+                >
+                  <td>{idx + 1}</td>
+                  <td>{salary.employeeID?.name || 'N/A'}</td>
+                  <td>{salary.employeeID?.email || 'N/A'}</td>
+                  <td>{salary.earnings?.gross ?? '—'}</td>
+                  <td>{salary?.netPay ?? '—'}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center">
+                  No salary records found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 export default Salaries;

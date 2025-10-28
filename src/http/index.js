@@ -41,7 +41,9 @@ export const viewLeaves = data => api.post('admin/view-leave-applications',data)
 export const updateLeave = (id,data) => api.post(`admin/update-leave/${id}`,data);
 export const assignSalary = data => api.post('admin/assign-employee-salary',data);
 export const updateSalary = data => api.post('admin/update-employee-salary',data);
-export const viewAllSalaries = data => api.post('admin/view-all-salary',data);
+export const viewAllSalaries = (data = {}) => api.post('/admin/view-all-salary', data);
+export const generateMonthlySalaries = data => api.post('admin/generate-monthly-salaries',data);
+
 
 //Leader
 export const getMembers_Leader = () => api.get('/leader/team/members');
@@ -57,6 +59,10 @@ export const applyforleave = data => api.post('/employee/apply-leave-application
 export const viewLeaveApplications = data  => api.post('/employee/view-leave-applications',data);
 export const viewEmployeeSalary = data => api.post('employee/view-salary',data);
 
+
+export const getAllUsers = () => api.get('/admin/all-users');
+
+
 api.interceptors.response.use((response)=>{
     console.log("All Cookies",document.cookie);
     return response.data;
@@ -66,3 +72,6 @@ api.interceptors.response.use((response)=>{
 })
 
 export default api;
+
+
+
