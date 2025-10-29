@@ -4,12 +4,16 @@ import { NavLink } from "react-router-dom";
 
 const RowEmployee = ({index,data}) =>
 {
+    const imageUrl = data.image
+    ? `http://localhost:5500/storage/images/profile/${data.image}`
+    : "/assets/icons/user.png"; // fallback image
+    
     const {user} = useSelector(state => state.authSlice); 
     console.log(user)
     return(
         <tr>
             <td>{index}</td>
-            <td><figure className="avatar"> <img src={data.image} alt={data.name}/> </figure></td>
+            <td><figure className="avatar"> <img src={`http://localhost:5500/storage/images/profile/${data.image}`} alt={data.name}/> </figure></td>
             <td>{data.name}</td>
             <td>{data.email}</td>
             <td>{data.mobile}</td>

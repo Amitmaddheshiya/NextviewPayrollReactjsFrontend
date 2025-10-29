@@ -43,7 +43,7 @@ export const assignSalary = data => api.post('admin/assign-employee-salary',data
 export const updateSalary = data => api.post('admin/update-employee-salary',data);
 export const viewAllSalaries = (data = {}) => api.post('/admin/view-all-salary', data);
 export const generateMonthlySalaries = data => api.post('admin/generate-monthly-salaries',data);
-
+export const deleteUser = (id) => api.delete(`/admin/user/${id}`);
 
 //Leader
 export const getMembers_Leader = () => api.get('/leader/team/members');

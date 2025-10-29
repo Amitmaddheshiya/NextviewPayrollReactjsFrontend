@@ -9,6 +9,7 @@ const AddUser = () => {
 
   const initialState = {
     name: "",
+    username: "",
     email: "",
     mobile: "",
     password: "",
@@ -47,6 +48,7 @@ const AddUser = () => {
 
     const {
       name,
+      username,
       email,
       mobile,
       password,
@@ -62,6 +64,7 @@ const AddUser = () => {
 
     if (
       !name ||
+      !username ||
       !email ||
       !mobile ||
       !password ||
@@ -80,8 +83,10 @@ const AddUser = () => {
       return;
     }
 
-    const fd = new FormData();
-    Object.keys(formData).forEach((key) => fd.append(key, formData[key]));
+   const fd = new FormData();
+Object.keys(formData).forEach((key) => fd.append(key, formData[key]));
+fd.append("username", formData.username); // ✅ ensure backend gets it
+
 
     const { success, message } = await addUser(fd);
     if (success) {
@@ -199,6 +204,29 @@ const AddUser = () => {
                     />
                   </div>
                 </div>
+
+              <div className="form-group col-md-6">
+  <label>Username</label>
+  <div className="input-group">
+    <div className="input-group-prepend">
+      <div className="input-group-text">
+        <i className="fas fa-user-circle"></i>
+      </div>
+    </div>
+    <input
+      type="text"
+      name="user_name"  // ✅ changed
+      id="username"
+      className="form-control"
+      value={formData.username}
+      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+      placeholder="Enter username"
+      autoComplete="new-username"  // ✅ prevents autofill
+    />
+  </div>
+</div>
+
+
 
                 <div className="form-group col-md-6">
                   <label>Enter Email</label>

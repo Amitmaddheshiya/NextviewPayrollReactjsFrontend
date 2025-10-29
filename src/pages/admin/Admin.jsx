@@ -1,17 +1,28 @@
 import { useEffect, useState } from "react";
 import { useParams, NavLink } from "react-router-dom";
-import { getUser } from "../../http";
+import { getUser, deleteUser } from "../../http";   // ✅ import deleteUser properly
+import { toast } from "react-toastify";             // ✅ import toast
+import "react-toastify/dist/ReactToastify.css";
 
 const Admin = () =>
 {
-    const [user,setUser] = useState({
-        name:'',
-        email:'',
-        mobile:'',
-        image:'',
-        address:'',
-        status:''
-    });
+     const [user, setUser] = useState({
+  name: "",
+  email: "",
+  mobile: "",
+  image: "",
+  address: "",
+  status: "",
+  type: "",
+  designation: "",
+  panNumber: "",
+  aadhaarNumber: "",   // ✅ correct spelling per DB
+  bankName: "",
+  accountNumber: "",
+  ifscCode: "",
+  date: "",
+});
+
     const {id} = useParams();
     useEffect(()=>{
         (async ()=>{
@@ -21,6 +32,24 @@ const Admin = () =>
         })();
     },[id])
 
+     const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        const res = await deleteUser(id);
+        console.log("Delete Response:", res);
+        if (res.success) {
+          toast.success("User deleted successfully");
+          window.location.href = "/employees"; // redirect to list
+        } else {
+          toast.error(res.message || "Failed to delete user");
+        }
+      } catch (err) {
+        console.error("Delete user error:", err);
+        toast.error("Error deleting user");
+      }
+    }
+  };
+
 
     return(
         <>
@@ -28,7 +57,14 @@ const Admin = () =>
         <section className="section">
             <div className="section-header  d-flex justify-content-between">
                 <h1>Admin</h1>
-                <NavLink to={`/edituser/${id}`} className='btn btn-primary'>Edit User</NavLink>
+                <div>
+            <NavLink to={`/edituser/${id}`} className="btn btn-primary me-2" style={{ marginRight: '15px' }}>
+              Edit User
+            </NavLink>
+            <button className="btn btn-danger" onClick={handleDelete}>
+              Delete User
+            </button>
+          </div>
             </div>
                 <div className="card">
                   <div className="card-body row">
@@ -53,6 +89,44 @@ const Admin = () =>
                                 <tr>
                                     <th>Address</th>
                                     <td>{user.address}</td>
+                                </tr>
+
+                                   <tr>
+                                    <th>type</th>
+                                    <td>{user.type}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status</th>
+                                    <td>{user.status}</td>
+                                </tr>
+                                <tr>
+                                    <th>Designation</th>
+                                    <td>{user.designation}</td>
+                                </tr>
+                                <tr>
+                                    <th>Pan number</th>
+                                    <td>{user.panNumber}</td>
+                                </tr>
+
+                                 <tr>
+                                    <th>Aadhaar Number</th>
+                                    <td>{user.aadhaarNumber}</td>
+                                </tr>
+                                <tr>
+                                    <th>Bank Name</th>
+                                    <td>{user.bankName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Account Number</th>
+                                    <td>{user.accountNumber}</td>
+                                </tr>
+                                <tr>
+                                    <th>IFSC Code</th>
+                                    <td>{user.ifscCode}</td>
+                                </tr>
+                                 <tr>
+                                    <th>Date</th>
+                                  <td>{new Date(user.date).toLocaleDateString()}</td>
                                 </tr>
                             </tbody>
                         </table>
