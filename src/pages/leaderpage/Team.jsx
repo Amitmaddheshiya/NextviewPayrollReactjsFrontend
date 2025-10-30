@@ -43,7 +43,7 @@ const Team = () => {
               <div className="card">
                 <div className="card-body row">
                   <div className="col-md-3 ">
-                    <img className='img-fluid img-thumbnail' src={team.image} alt="" />
+                    <img className='img-fluid img-thumbnail' src={team.profile} alt="" />
                   </div>
                   <div className="col-md-9">
                     <table className='table'>
@@ -62,7 +62,7 @@ const Team = () => {
                             { 
                               team.leader ?
                                 <button  className='badge btn badge-primary' onClick={modalLeaderAction} style={{padding:'0px 10px 0px 0px'}}>
-                                <img src={team.leader.image} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
+                                <img src={team.leader.profile} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
                                 {team.leader.name}
                             </button>
                             :

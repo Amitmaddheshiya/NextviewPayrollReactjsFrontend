@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import CountsCard from "../../../components/dashboard/CountsCard";
 import RowMember from "../../../components/rows/row-member";
-import { getFreeEmployees, getTeam, getTeamMembers, getFreeLeaders } from "../../../http";
+import { getFreeEmployees, getTeam, getTeamMembers, getFreeLeaders, deleteTeam} from "../../../http";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { setTeam, setTeamInformation } from '../../../store/team-slice';
@@ -10,6 +10,8 @@ import { setFreeEmployees, setTeamMembers,setFreeLeaders } from '../../../store/
 import LeaderModal from "./modal/LeaderModal";
 import LeadersModal from "./modal/LeadersModal";
 import MembersModal from "./modal/MembersModal";
+import { toast } from "react-toastify";             // ✅ import toast
+import "react-toastify/dist/ReactToastify.css";
 
 
 const Team = () => {
@@ -41,6 +43,7 @@ const Team = () => {
       }
     })();
   }, [id])
+
 
   const modalAction = async () => {
     setShowModal(showModal ? false : true);
@@ -84,6 +87,21 @@ const Team = () => {
                 <h1>Team</h1>
                 <div>
                   <NavLink to={`/editteam/${id}`} className='btn btn-primary mr-4'>Edit Team</NavLink>
+                  <button className='btn btn-danger mr-4' onClick={async () =>
+                  {
+                      if(window.confirm('Are You Sure To Delete This Team ?'))
+                      {
+                          const res = await deleteTeam(id);
+                          if(res.success)
+                          {
+                             toast.success("Team deleted successfully");
+                             // ✅ redirect based on user type
+                              window.location.href = "/teams";
+                          }else {
+                                      toast.error(res.message || "Failed to delete user");
+                                    }
+                      }
+                  }}>Delete Team</button>
                   <button onClick={modalAction} className='btn btn-primary'>Add Member</button>
                 </div>
               </div>
@@ -97,7 +115,7 @@ const Team = () => {
               <div className="card">
                 <div className="card-body row">
                   <div className="col-md-3 ">
-                    <img className='img-fluid img-thumbnail' src={team.image} alt="" />
+                    <img className='img-fluid img-thumbnail' src={team.profile} alt="" />
                   </div>
                   <div className="col-md-9">
                     <table className='table'>
@@ -116,7 +134,7 @@ const Team = () => {
                             { 
                               team.leader ?
                                 <button  className='badge btn badge-primary' onClick={modalLeaderAction} style={{padding:'0px 10px 0px 0px'}}>
-                                <img src={team.leader.image} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
+                                <img src={team.leader.profile} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
                                 {team.leader.name}
                             </button>
                             :

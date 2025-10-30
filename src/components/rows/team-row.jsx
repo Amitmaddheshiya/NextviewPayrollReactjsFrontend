@@ -5,12 +5,12 @@ const RowTeam = ({index,data}) =>
     return(
         <tr>
             <td>{index}</td>
-            <td><figure className="avatar"> <img src={data.image} alt={data.name}/> </figure></td>
+            <td><figure className="avatar"> <img src={data.profile} alt={data.name}/> </figure></td>
             <td>{data.name}</td>
             <td>
                 { data.leader ?
                     <NavLink to='/' className='badge  badge-primary' style={{padding:'0px 10px 0px 0px'}}>
-                    <img src={data.leader.image} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
+                    <img src={data.profile} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
                     {data.leader.name}
                 </NavLink>
                 :

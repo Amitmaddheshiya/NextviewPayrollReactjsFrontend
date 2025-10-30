@@ -50,7 +50,7 @@ const EditUser = () => {
           type: data.type || "Employee",
           designation: data.designation || "",
           address: data.address || "",
-          profile: data.image || "",
+          profile: data.profile || "",
           status: data.status || "Active",
           adminPassword: "",
           aadhaarNumber: data.aadhaarNumber || "",
@@ -61,8 +61,8 @@ const EditUser = () => {
         });
 
         // 🖼️ set preview if existing image
-        if (data.image) {
-         setImagePreview(`http://localhost:5500/storage/images/profile/${data.image}`);
+        if (data.profile) {
+         setImagePreview(res.data.profile);
         } else {
           setImagePreview("/assets/icons/user.png");
         }
@@ -82,8 +82,8 @@ const EditUser = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    setFormData((old) => ({ ...old, image: file }));
-    setUpdatedFormData((old) => ({ ...old, image: file }));
+    setFormData((old) => ({ ...old, profile: file }));
+    setUpdatedFormData((old) => ({ ...old, profile: file }));
 
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
@@ -103,15 +103,15 @@ const EditUser = () => {
     });
 
     // image
-    if (updateFormData.image) {
-      fd.append("image", updateFormData.image);
+    if (updateFormData.profile) {
+      fd.append("profile", updateFormData.profile);
     }
 
     const { success, message } = await updateUser(id, fd);
     if (success) {
       toast.success(message || "User updated successfully");
     } else {
-      toast.error("Failed to update user");
+      toast.error(message || "Failed to update user");
     }
   };
 

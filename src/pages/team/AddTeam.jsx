@@ -5,7 +5,7 @@ import { addTeam } from "../../http";
 
 const AddTeam = () =>
 {
-    const initialState = {name:'',description:'',image:''};
+    const initialState = {name:'',description:'',profile:''};
     const [imagePreview, setImagePreview] = useState('/assets/icons/team.png');
     const [formData,setFormData] = useState(initialState);
 
@@ -49,7 +49,7 @@ const AddTeam = () =>
         {
             return{
                 ...old,
-                image:file
+                profile:file
             }
 
         })
@@ -68,8 +68,8 @@ const AddTeam = () =>
                     <form className='row' onSubmit={onSubmit}>
                         <div className="form-group col-md-12 text-center">
                             <div className="input-group justify-content-center">
-                                <input type="file" id='image' name='image' className="form-control d-none" onChange={captureImage} accept="image/*" />
-                                <label htmlFor='image'> <img className='rounded' src={imagePreview} width='120' alt="" /> </label>
+                                <input type="file" id='profile' name='profile' className="form-control d-none" onChange={captureImage} accept="image/*" />
+                                <label htmlFor='profile'> <img className='rounded' src={imagePreview} width='120' alt="" /> </label>
                             </div>
                         </div>
 

@@ -4,8 +4,9 @@ import { NavLink } from "react-router-dom";
 
 const RowEmployee = ({index,data}) =>
 {
-    const imageUrl = data.image
-    ? `http://localhost:5500/storage/images/profile/${data.image}`
+    console.log(data)
+    const imageUrl = data.profile
+    ? `http://localhost:5500/storage/images/profile/${data.profile}`
     : "/assets/icons/user.png"; // fallback image
     
     const {user} = useSelector(state => state.authSlice); 
@@ -13,18 +14,19 @@ const RowEmployee = ({index,data}) =>
     return(
         <tr>
             <td>{index}</td>
-            <td><figure className="avatar"> <img src={`http://localhost:5500/storage/images/profile/${data.image}`} alt={data.name}/> </figure></td>
+            <td><figure className="avatar"> <img src={data.profile} alt={data.name}/> </figure></td>
             <td>{data.name}</td>
             <td>{data.email}</td>
             <td>{data.mobile}</td>
             <td><div className={`badge ${data.status==='Active' ? 'badge-primary' :'badge-danger'}`}>{data.status}</div></td>
+         
             
             {
                 user.type==="Admin"?
                 (<td>
                 { data.team ?
                     <NavLink to={`/team/${data.team.id}`} className='badge  badge-primary' style={{padding:'0px 10px 0px 0px'}}>
-                    <img src={data.team.image} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
+                    <img src={data.profile} className='avatar avatar-sm mr-2' alt="Person" width="96" height="96"/>
                     {data.team.name}
                 </NavLink>
                 :

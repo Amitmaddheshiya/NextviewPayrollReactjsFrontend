@@ -94,6 +94,8 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
       setShowModal(false);
       setFormData({ ...initialState });
       setImagePreview("/assets/icons/user.png");
+    }else {
+      toast.error(message || "Failed to add user");
     }
   };
 
@@ -183,6 +185,9 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                       alt=""
                     />
                   </label>
+                  <small className="form-text text-muted mt-2">
+    Click image to change profile photo
+  </small>
                 </div>
 
                 {/* Basic Details */}

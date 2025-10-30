@@ -43,7 +43,7 @@ const LeaderModal = ({close}) =>
             leader && 
             <div className="text-center">
             <div className="input-group justify-content-center text-center">
-                <img className='rounded' src={leader.image} width='120' alt="" /> 
+                <img className='rounded' src={leader.profile} width='120' alt="" /> 
             </div>
             <table className='table table-md'>
                 <tr>

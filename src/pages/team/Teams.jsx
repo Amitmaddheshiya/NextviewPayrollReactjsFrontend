@@ -18,7 +18,7 @@ const Teams = () =>
         (async ()=>{
             const res = await getTeams();
             if(res.success)
-            {
+            {console.log("Teams Data:", res.data);
                 setTeams(res.data);
                 setLoading(false);
             }

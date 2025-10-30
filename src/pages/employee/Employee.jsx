@@ -10,7 +10,7 @@ const Employee = () =>
   name: "",
   email: "",
   mobile: "",
-  image: "",
+  profile: "",
   address: "",
   status: "",
   type: "",
@@ -28,7 +28,7 @@ const Employee = () =>
     useEffect(()=>{
         (async ()=>{
             const res = await getUser(id);
-            if(res.success)
+            if(res.success) 
                 setUser(res.data);
         })();
     },[id])
@@ -41,7 +41,7 @@ const Employee = () =>
             <div className="section-header d-flex justify-content-between align-items-center ">
   <h1>Employee</h1>
   <div>
-    <NavLink to={`/edituser/${id}`} className="btn btn-primary me-3"  style={{ marginRight: "15px" }}>Edit User</NavLink>
+    <NavLink to={`/edituser/${id}`} className="btn btn-primary me-3"  style={{ marginRight: "15px" }}> {user.type === "Leader" ? "Edit Leader" : "Edit Employee"}</NavLink>
     <button 
       className="btn btn-danger"
       onClick={async () => {
@@ -49,14 +49,19 @@ const Employee = () =>
           const res = await deleteUser(id);
           if(res.success) {
             toast.success("User deleted successfully");
-            window.location.href = "/employees"; // redirect back to list
+              // ✅ redirect based on user type
+        if (user.type === "Leader") {
+          window.location.href = "/leaders";
+        } else {
+          window.location.href = "/employees";
+        }
           } else {
             toast.error(res.message || "Failed to delete user");
           }
         }
       }}
     >
-      Delete User
+      {user.type === "Leader" ? "Delete Leader" : "Delete Employee"}
     </button>
   </div>
 </div>
@@ -64,7 +69,7 @@ const Employee = () =>
                 <div className="card">
                   <div className="card-body row">
                     <div className="col-md-3 ">
-                        <img className='img-fluid img-thumbnail' src={user.image} alt="" />
+                        <img className='img-fluid img-thumbnail' src={user.profile} alt="" />
                     </div>
                     <div className="col-md-9">
                        <table className='table'>

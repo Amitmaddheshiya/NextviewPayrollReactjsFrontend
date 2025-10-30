@@ -11,14 +11,14 @@ const DashboardEmployee = () => {
     <section className="section">
             <div className="card">
               <div className="card-header d-flex justify-content-between">
-                <h4>Welcome {user?.name}</h4>
+                <h4>Welcome to {user?.type}</h4>
               </div>
             </div>
 
             <div className="card">
                   <div className="card-body row">
                     <div className="col-md-3 ">
-                        <img className='img-fluid img-thumbnail' src={user.image} alt="" />
+                        <img className='img-fluid img-thumbnail' src={user.profile} alt="" />
                     </div>
                     <div className="col-md-9">
                        <table className='table'>
@@ -51,9 +51,6 @@ const DashboardEmployee = () => {
                                     <th>Address</th>
                                     <td>{user.address}</td>
                                 </tr>
-                                
-
-
                             </tbody>
                         </table>
                     </div>

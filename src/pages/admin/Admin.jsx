@@ -10,7 +10,7 @@ const Admin = () =>
   name: "",
   email: "",
   mobile: "",
-  image: "",
+  profile: "",
   address: "",
   status: "",
   type: "",
@@ -39,7 +39,7 @@ const Admin = () =>
         console.log("Delete Response:", res);
         if (res.success) {
           toast.success("User deleted successfully");
-          window.location.href = "/employees"; // redirect to list
+          window.location.href = "/admins"; // redirect to list
         } else {
           toast.error(res.message || "Failed to delete user");
         }
@@ -59,17 +59,17 @@ const Admin = () =>
                 <h1>Admin</h1>
                 <div>
             <NavLink to={`/edituser/${id}`} className="btn btn-primary me-2" style={{ marginRight: '15px' }}>
-              Edit User
+              Edit Admin
             </NavLink>
             <button className="btn btn-danger" onClick={handleDelete}>
-              Delete User
+              Delete Admin
             </button>
           </div>
             </div>
                 <div className="card">
                   <div className="card-body row">
                     <div className="col-md-3 ">
-                        <img className='img-fluid img-thumbnail' src={user.image} alt="" />
+                        <img className='img-fluid img-thumbnail' src={user.profile} alt="" />
                     </div>
                     <div className="col-md-9">
                        <table className='table'>
