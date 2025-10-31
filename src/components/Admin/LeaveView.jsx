@@ -152,7 +152,7 @@ const LeaveView = () => {
                 </div>
               </div>
 
-              <div className="form-group col-md-2 d-flex align-items-end">
+              <div className="form-group col-md-2 d-flex align-items-end mt-4">
                 <button
                   onClick={searchLeaveApplications}
                   className="btn btn-lg btn-primary w-100"

@@ -50,6 +50,10 @@ const Employee = () => {
                                     <th>Address</th>
                                     <td>{user.address}</td>
                                 </tr>
+                                <tr>
+                                    <th>Work Type</th>
+                                    <td>{user.workType}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

@@ -85,6 +85,7 @@ const Salaries = () => {
               <th>Email</th>
               <th>Gross Salary</th>
               <th>Net Pay</th>
+              <th>View & Update</th>
             </tr>
           </thead>
           <tbody>
@@ -93,13 +94,17 @@ const Salaries = () => {
                 <tr
                   key={salary._id || idx}
                   className="hover-effect"
-                  onClick={() => history.push(`salary/${salary._id}`)}
                 >
                   <td>{idx + 1}</td>
                   <td>{salary.employeeID?.name || 'N/A'}</td>
                   <td>{salary.employeeID?.email || 'N/A'}</td>
                   <td>{salary.earnings?.gross ?? '—'}</td>
                   <td>{salary?.netPay ?? '—'}</td>
+                  <td>
+                    <button  onClick={() => history.push(`salary/${salary._id}`)} className="btn btn-primary btn-sm">
+                      View & Update
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (

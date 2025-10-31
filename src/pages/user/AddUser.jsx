@@ -14,6 +14,7 @@ const AddUser = () => {
     mobile: "",
     password: "",
     type: "Employee",
+    workType: "Onsite", // ✅ added
     designation: "",
     address: "",
     profile: "",
@@ -23,6 +24,8 @@ const AddUser = () => {
     bankName: "",
     accountNumber: "",
     ifscCode: "",
+    uan: "", // ✅ added
+    esi: "", // ✅ added
   };
 
   const [formData, setFormData] = useState(initialState);
@@ -53,6 +56,8 @@ const AddUser = () => {
       mobile,
       password,
       type,
+      workType, // ✅ added
+      designation,
       address,
       profile,
       aadhaarNumber,
@@ -60,6 +65,8 @@ const AddUser = () => {
       bankName,
       accountNumber,
       ifscCode,
+      uan,
+      esi, // ✅ added  
     } = formData;
 
     if (
@@ -69,24 +76,29 @@ const AddUser = () => {
       !mobile ||
       !password ||
       !type ||
+      !workType || // ✅ added
+      !designation ||
       !address ||
       !aadhaarNumber ||
       !panNumber ||
       !bankName ||
       !accountNumber ||
-      !ifscCode
+      !ifscCode ||
+      !uan ||      // ✅ added
+      !esi         // ✅ added
     )
       return toast.error("All fields are required");
+
     if (!profile) return toast.error("Please choose an image");
+
     if (type === "Admin" && !showModal) {
       setShowModal(true);
       return;
     }
 
-   const fd = new FormData();
-Object.keys(formData).forEach((key) => fd.append(key, formData[key]));
-fd.append("username", formData.username); // ✅ ensure backend gets it
-
+    const fd = new FormData();
+    Object.keys(formData).forEach((key) => fd.append(key, formData[key]));
+    fd.append("username", formData.username);
 
     const { success, message } = await addUser(fd);
     if (success) {
@@ -94,7 +106,7 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
       setShowModal(false);
       setFormData({ ...initialState });
       setImagePreview("/assets/icons/user.png");
-    }else {
+    } else {
       toast.error(message || "Failed to add user");
     }
   };
@@ -105,6 +117,7 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
     <>
       {showModal && (
         <Modal close={modalAction} title="Add Admin" width="35%">
+          {/* Modal content same as before */}
           <div className="row" style={{ margin: "20px" }}>
             <div className="col col-md-4 text-center">
               <img className="rounded" src={imagePreview} width="120" alt="" />
@@ -168,6 +181,7 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
           <div className="card">
             <div className="card-body pr-5 pl-5 m-1">
               <form className="row" onSubmit={onSubmit} id="addUserForm">
+                {/* Profile Upload */}
                 <div className="form-group col-md-12 text-center">
                   <input
                     type="file"
@@ -186,11 +200,11 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                     />
                   </label>
                   <small className="form-text text-muted mt-2">
-    Click image to change profile photo
-  </small>
+                    Click image to change profile photo
+                  </small>
                 </div>
 
-                {/* Basic Details */}
+                {/* Name */}
                 <div className="form-group col-md-6">
                   <label>Enter Name</label>
                   <div className="input-group">
@@ -210,29 +224,31 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                   </div>
                 </div>
 
-              <div className="form-group col-md-6">
-  <label>Username</label>
-  <div className="input-group">
-    <div className="input-group-prepend">
-      <div className="input-group-text">
-        <i className="fas fa-user-circle"></i>
-      </div>
-    </div>
-    <input
-      type="text"
-      name="user_name"  // ✅ changed
-      id="username"
-      className="form-control"
-      value={formData.username}
-      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-      placeholder="Enter username"
-      autoComplete="new-username"  // ✅ prevents autofill
-    />
-  </div>
-</div>
+                {/* Username */}
+                <div className="form-group col-md-6">
+                  <label>Username</label>
+                  <div className="input-group">
+                    <div className="input-group-prepend">
+                      <div className="input-group-text">
+                        <i className="fas fa-user-circle"></i>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      name="username"
+                      id="username"
+                      className="form-control"
+                      value={formData.username}
+                      onChange={(e) =>
+                        setFormData({ ...formData, username: e.target.value })
+                      }
+                      placeholder="Enter username"
+                      autoComplete="new-username"
+                    />
+                  </div>
+                </div>
 
-
-
+                {/* Email, Mobile, Password */}
                 <div className="form-group col-md-6">
                   <label>Enter Email</label>
                   <div className="input-group">
@@ -252,7 +268,7 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                   </div>
                 </div>
 
-                <div className="form-group col-md-4">
+                <div className="form-group col-md-3">
                   <label>Mobile Number</label>
                   <div className="input-group">
                     <div className="input-group-prepend">
@@ -271,7 +287,7 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                   </div>
                 </div>
 
-                <div className="form-group col-md-4">
+                <div className="form-group col-md-3">
                   <label>Password</label>
                   <div className="input-group">
                     <div className="input-group-prepend">
@@ -290,7 +306,8 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                   </div>
                 </div>
 
-                <div className="form-group col-md-4">
+                {/* User Type and Work Type */}
+                <div className="form-group col-md-3">
                   <label>User Type</label>
                   <select
                     name="type"
@@ -304,6 +321,21 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                   </select>
                 </div>
 
+                <div className="form-group col-md-3">
+                  <label>Work Type</label> {/* ✅ Added field */}
+                  <select
+                    name="workType"
+                    onChange={inputEvent}
+                    value={formData.workType}
+                    className="form-control select2"
+                  >
+                    <option>Onsite</option>
+                    <option>Remote</option>
+                    <option>Hybrid</option>
+                  </select>
+                </div>
+
+                {/* Designation + Address */}
                 <div className="form-group col-md-6">
                   <label>Designation</label>
                   <div className="input-group">
@@ -343,7 +375,7 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                   </div>
                 </div>
 
-                {/* Personal Details Section */}
+                {/* Personal & Bank Details */}
                 <div className="col-md-12 mt-3">
                   <h5 className="text-primary">Personal & Bank Details</h5>
                   <hr />
@@ -407,6 +439,33 @@ fd.append("username", formData.username); // ✅ ensure backend gets it
                     type="text"
                     id="ifscCode"
                     name="ifscCode"
+                    className="form-control"
+                  />
+                </div>
+
+                {/* ✅ New Fields */}
+                <div className="form-group col-md-6">
+                  <label>UAN Number</label>
+                  <input
+                    onChange={inputEvent}
+                    value={formData.uan}
+                    type="text"
+                    id="uanNumber"
+                    name="uan"
+                    placeholder="UAN123456789"
+                    className="form-control"
+                  />
+                </div>
+
+                <div className="form-group col-md-6">
+                  <label>ESI Number</label>
+                  <input
+                    onChange={inputEvent}
+                    value={formData.esi}
+                    type="text"
+                    id="esiNumber"
+                    name="esi"
+                    placeholder="ESI123456789"
                     className="form-control"
                   />
                 </div>

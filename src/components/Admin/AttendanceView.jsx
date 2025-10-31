@@ -212,37 +212,53 @@ const AttendanceView = () => {
       <div className="table-responsive mt-4">
         {attendance && attendance.length > 0 ? (
           <table className="table table-striped table-md center-text">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Date</th>
-                <th>Day</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {attendance.map((att, idx) => (
-                <tr key={`${att._id || idx}-${att.date}-${att.month}`}>
-                  <td>{idx + 1}</td>
-                  <td>{employeeMap[att.employeeID]?.[0]}</td>
-                  <td>{employeeMap[att.employeeID]?.[1]}</td>
-                  <td>{`${att.date}/${att.month}/${att.year}`}</td>
-                  <td>{att.day}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        att.present ? "badge-success" : "badge-danger"
-                      }`}
-                    >
-                      {att.present ? "Present" : "Absent"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Date</th>
+      <th>Day</th>
+      <th>Status</th>
+      <th>In Time</th>
+      <th>Out Time</th>
+      <th>Late</th>
+      <th>Total Hours</th>
+    </tr>
+  </thead>
+  <tbody>
+    {attendance.map((att, idx) => (
+      <tr key={`${att._id || idx}-${att.date}-${att.month}`}>
+        <td>{idx + 1}</td>
+        <td>{employeeMap[att.employeeID]?.[0]}</td>
+        <td>{employeeMap[att.employeeID]?.[1]}</td>
+        <td>{`${att.date}/${att.month}/${att.year}`}</td>
+        <td>{att.day}</td>
+        <td>
+          <span
+            className={`badge ${
+              att.present ? "badge-success" : "badge-danger"
+            }`}
+          >
+            {att.present ? "Present" : "Absent"}
+          </span>
+        </td>
+        <td>{att.attendanceIn || "-"}</td>
+        <td>{att.attendanceOut || "-"}</td>
+        <td
+          style={{
+            color: att.late === "Yes" ? "red" : "green",
+            fontWeight: "bold",
+          }}
+        >
+          {att.late || "-"}
+        </td>
+        <td>{att.totalHours || "-"}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
         ) : (
           <div className="text-center py-5">
             <h5 className="text-muted">
