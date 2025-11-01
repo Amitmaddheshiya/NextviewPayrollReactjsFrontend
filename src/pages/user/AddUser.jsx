@@ -6,6 +6,7 @@ import Modal from "../../components/modal/Modal";
 
 const AddUser = () => {
   const [imagePreview, setImagePreview] = useState("/assets/icons/user.png");
+  const [showPassword, setShowPassword] = useState(false);
 
   const initialState = {
     name: "",
@@ -287,24 +288,33 @@ const AddUser = () => {
                   </div>
                 </div>
 
-                <div className="form-group col-md-3">
-                  <label>Password</label>
-                  <div className="input-group">
-                    <div className="input-group-prepend">
-                      <div className="input-group-text">
-                        <i className="fas fa-lock"></i>
-                      </div>
-                    </div>
-                    <input
-                      onChange={inputEvent}
-                      value={formData.password}
-                      type="password"
-                      id="password"
-                      name="password"
-                      className="form-control"
-                    />
-                  </div>
-                </div>
+<div className="form-group col-md-3">
+  <label>Password</label>
+  <div className="input-group">
+    <div className="input-group-prepend">
+      <div className="input-group-text">
+        <i className="fas fa-lock"></i>
+      </div>
+    </div>
+    <input
+      onChange={inputEvent}
+      value={formData.password}
+      type={showPassword ? "text" : "password"}
+      id="password"
+      name="password"
+      className="form-control"
+    />
+    <div
+      className="input-group-append"
+      onClick={() => setShowPassword(!showPassword)}
+      style={{ cursor: "pointer" }}
+    >
+      <div className="input-group-text">
+        <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+      </div>
+    </div>
+  </div>
+</div>
 
                 {/* User Type and Work Type */}
                 <div className="form-group col-md-3">

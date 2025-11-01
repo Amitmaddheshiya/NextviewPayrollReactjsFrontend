@@ -59,7 +59,6 @@ const Attendance = () => {
         );
         if (distance <= ALLOWED_DISTANCE) {
           setIsNearOffice(true);
-          toast.success("You're at the office. Attendance enabled!");
         } else {
           setIsNearOffice(false);
           toast.error("You must be at the office to mark attendance!");
@@ -151,7 +150,9 @@ const Attendance = () => {
                     Check Out
                   </button>
                 ) : (
-                  <button className="btn btn-secondary" disabled>
+                  <button className="btn btn-secondary" onClick={() => {
+                    toast.info("Attendance for today is already marked.");
+                  }}>
                     Attendance Completed
                   </button>
                 )}

@@ -85,12 +85,13 @@ const AssignSalary = () => {
   const loanRecovery = n(formData.loanRecovery);
 
   const calculateAnnualTDSFromSlabs = (annualTaxable) => {
-    const slabs = [
-      { upto: 250000, rate: 0 },
-      { upto: 500000, rate: 0.05 },
-      { upto: 1000000, rate: 0.2 },
-      { upto: Infinity, rate: 0.3 },
-    ];
+   const slabs = [
+    { upto: 1200000, rate: 0 },     // Up to ₹12 lakh → 0%
+    { upto: 1600000, rate: 0.15 },  // ₹12–16 lakh → 15%
+    { upto: 2000000, rate: 0.20 },  // ₹16–20 lakh → 20%
+    { upto: 2400000, rate: 0.25 },  // ₹20–24 lakh → 25%
+    { upto: Infinity, rate: 0.30 }, // ₹24 lakh+ → 30%
+  ];
     let remaining = annualTaxable;
     let tax = 0;
     let lower = 0;

@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 const LoginForm = () =>
 {  
     const dispatch = useDispatch();
+    const [showPassword,setShowPassword] = useState(false);
     const [formData,setFormData] = useState({
         email:'',
         password:''
@@ -32,8 +33,13 @@ const LoginForm = () =>
         if(!email || !password) return toast.error('All Fields Required');
         const res = await doLogin({email,password});
         const {success} = res;
-        if(success)
+        if(success){
+            toast.success("Login Successful");
             dispatch(setAuth(res.user));
+        }else{
+            toast.error(res.message);
+        }
+            
     }
 
     return(
@@ -67,7 +73,23 @@ const LoginForm = () =>
                             </NavLink>
                           </div>
                         </div>
-                        <input id="password" onChange={inputEvent} value={formData.password} type="password" className="form-control" name="password" tabIndex="2" required/>
+                       <div className="input-group">
+                        <div className="input-group-prepend">
+                          <div className="input-group-text">
+                            <i className="fas fa-lock"></i>
+                          </div>
+                        </div>
+                         <input id="password" onChange={inputEvent} value={formData.password} type={showPassword ? "text" : "password"} className="form-control" name="password" tabIndex="2" required/><div
+      className="input-group-append"
+      onClick={() => setShowPassword(!showPassword)}
+      style={{ cursor: "pointer" }}
+    >
+      <div className="input-group-text">
+        <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+      </div>
+    </div>
+                       </div>
+                       
                         <div className="invalid-feedback">
                           please fill in your password
                         </div>
@@ -80,6 +102,20 @@ const LoginForm = () =>
                         </button>
                       </div>
                     </form>
+                  </div>
+                  <div className="card-footer">
+                    <div className="d-flex justify-content-between">
+                      {/* This is a comment    <div className="float-left">
+                        <NavLink to="/register" className="text-small">
+                          Create new account
+                        </NavLink>
+                      </div> */}
+                      <div className="float-right">
+                        <NavLink to="/forgot" className="text-small">
+                          Forgot Password?
+                        </NavLink>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="simple-footer">
@@ -96,8 +132,8 @@ const LoginForm = () =>
 </svg>
                   </a>
 
-                  <a class="ml-2" href="https://vercel.com/amitmaddheshiyas-projects" target="_blank" rel="noopener noreferrer">
-                 <img style={{"width":"25px"}} src="https://raw.githubusercontent.com/deepak-singh5219/Digital-Portfolio/main/public/favicon.ico" alt="" />
+                  <a class="ml-2" href="https://amit-maddheshiya-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer">
+                 <img style={{"width":"25px"}} src="https://media.licdn.com/dms/image/v2/C4D03AQGpAY1-psyqlg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1644309208984?e=2147483647&v=beta&t=ZFQR_qmEPm0R6-nbwfz3fP-xH5rBFQR46BuX9LRPTnE" alt="" />
                   </a>
                 </div>
               </div>

@@ -33,6 +33,7 @@ const EditUser = () => {
   const [updateFormData, setUpdatedFormData] = useState({});
   const [userType, setUserType] = useState("User");
   const [showModal, setShowModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { id } = useParams();
 
   // 🧠 Fetch user data when component loads
@@ -259,17 +260,33 @@ const EditUser = () => {
                     className="form-control"
                   />
                 </div>
-
-                <div className="form-group col-md-3">
-                  <label>Password</label>
-                  <input
-                    onChange={inputEvent}
-                    value={formData.password}
-                    name="password"
-                    type="password"
-                    className="form-control"
-                  />
-                </div>
+<div className="form-group col-md-3">
+  <label>Password</label>
+  <div className="input-group">
+    <div className="input-group-prepend">
+      <div className="input-group-text">
+        <i className="fas fa-lock"></i>
+      </div>
+    </div>
+    <input
+      onChange={inputEvent}
+      value={formData.password}
+      type={showPassword ? "text" : "password"}
+      id="password"
+      name="password"
+      className="form-control"
+    />
+    <div
+      className="input-group-append"
+      onClick={() => setShowPassword(!showPassword)}
+      style={{ cursor: "pointer" }}
+    >
+      <div className="input-group-text">
+        <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+      </div>
+    </div>
+  </div>
+</div>
 
                 <div className="form-group col-md-3">
                   <label>User Type</label>
