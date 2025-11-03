@@ -30,6 +30,8 @@ const AttendanceView = () => {
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [loading, setLoading] = useState(true);
   const [noDataMessage, setNoDataMessage] = useState("");
+  const [editPresent, setEditPresent] = useState(true);
+
 
 
 
@@ -38,59 +40,89 @@ const [editData, setEditData] = useState(null);
 const [editInTime, setEditInTime] = useState("");
 const [editOutTime, setEditOutTime] = useState("");
 
+useEffect(() => {
+  if (!editPresent) {
+    setEditInTime("");
+    setEditOutTime("");
+  }
+}, [editPresent]);
 
   // ✅ Fetch all employees + current month attendance on load
-  useEffect(() => {
-    const fetchEmployeesAndAttendance = async () => {
-      setLoading(true);
-      let empObj = {};
+  // ✅ Fetch all employees + current month attendance on load
+useEffect(() => {
+  const fetchEmployeesAndAttendance = async () => {
+    setLoading(true);
+    let empObj = {};
 
-      try {
-        // Fetch employee lists
-        const [emps, leaders, admins] = await Promise.all([
-          getEmployees(),
-          getLeaders(),
-          getAdmins(),
-        ]);
+    try {
+      // 🔹 Fetch employees (all roles)
+      const [emps, leaders, admins] = await Promise.all([
+        getEmployees(),
+        getLeaders(),
+        getAdmins(),
+      ]);
 
-        emps.data.forEach(
-          (e) => (empObj[e.id] = [e.name, e.email])
-        );
-        leaders.data.forEach(
-          (l) => (empObj[l.id] = [l.name, l.email])
-        );
-        admins.data.forEach(
-          (a) => (empObj[a.id] = [a.name, a.email])
-        );
+      // ✅ Merge all employees into single array
+      const allEmployees = [...emps.data, ...leaders.data, ...admins.data];
 
-        setEmployeeMap(empObj);
-        setEmployees([...emps.data, ...leaders.data, ...admins.data]);
+      // ✅ Create map for quick name lookup
+      allEmployees.forEach(e => {
+        empObj[e.id] = [e.name, e.email];
+      });
 
-        // ✅ Fetch attendance for current month (all employees)
-        const now = new Date();
-        const obj = {
-          year: now.getFullYear(),
-          month: now.getMonth() + 1,
-        };
+      setEmployeeMap(empObj);
+      setEmployees(allEmployees);
 
-        const res = await getAttendance(obj);
-        const { data } = res;
-        setAttendance(data);
-        setNoDataMessage(
-          data.length === 0
-            ? "No attendance records found for this month."
-            : ""
-        );
-      } catch (error) {
-        console.error(error);
-        setNoDataMessage("Error fetching attendance data.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      // 🔹 Fetch attendance for current month
+      const now = new Date();
+      const obj = {
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+      };
 
-    fetchEmployeesAndAttendance();
-  }, []);
+      const res = await getAttendance(obj);
+      const data = res?.data || [];
+
+      // ✅ Merge attendance + absent employees
+      let mergedData = [...data];
+      allEmployees.forEach(emp => {
+        const hasRecord = data.some(a => a.employeeID === emp.id);
+        if (!hasRecord) {
+          mergedData.push({
+            employeeID: emp.id,
+            name: emp.name,
+            date: "-",
+            month: obj.month,
+            year: obj.year,
+            day: "-",
+            present: false,
+            attendanceIn: "-",
+            attendanceOut: "-",
+            totalHours: "-",
+            late: "-",
+            timeStatus: "-",
+          });
+        }
+      });
+
+      // ✅ Set attendance and status
+      setAttendance(mergedData);
+      setNoDataMessage(
+        mergedData.length === 0
+          ? "No attendance records found for this month."
+          : ""
+      );
+    } catch (error) {
+      console.error(error);
+      setNoDataMessage("Error fetching attendance data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchEmployeesAndAttendance();
+}, []);
+
 
   // ✅ Search by specific date (for specific employee if selected)
   const searchAttendance = async () => {
@@ -112,7 +144,31 @@ const [editOutTime, setEditOutTime] = useState("");
     try {
       const res = await getAttendance(obj);
       const { data } = res;
-      setAttendance(data);
+// 🔹 Generate virtual "absent" records
+let mergedData = [...data];
+
+employees.forEach(emp => {
+  const hasRecord = data.some(a => a.employeeID === emp.id);
+  if (!hasRecord) {
+    mergedData.push({
+      employeeID: emp.id,
+      date: obj.date || "-",
+      month: obj.month,
+      year: obj.year,
+      day: "-",
+      present: false,
+      attendanceIn: "-",
+      attendanceOut: "-",
+      totalHours: "-",
+      late: "-",
+      timeStatus: "-",
+    });
+  }
+});
+
+setAttendance(mergedData);
+
+   
       setNoDataMessage(
         data.length === 0
           ? "No attendance records found for the selected date."
@@ -146,7 +202,31 @@ const [editOutTime, setEditOutTime] = useState("");
     try {
       const res = await getAttendance(obj);
       const data = res?.data || [];
-      setAttendance(data);
+// 🔹 Generate virtual "absent" records
+let mergedData = [...data];
+
+employees.forEach(emp => {
+  const hasRecord = data.some(a => a.employeeID === emp.id);
+  if (!hasRecord) {
+    mergedData.push({
+      employeeID: emp.id,
+      date: obj.date || "-",
+      month: obj.month,
+      year: obj.year,
+      day: "-",
+      present: false,
+      attendanceIn: "-",
+      attendanceOut: "-",
+      totalHours: "-",
+      late: "-",
+      timeStatus: "-",
+    });
+  }
+});
+
+setAttendance(mergedData);
+
+ 
       setNoDataMessage(
         data.length === 0
           ? "No attendance records found for this month."
@@ -279,14 +359,23 @@ const [editOutTime, setEditOutTime] = useState("");
     const day = (att.day || "").toLowerCase();
 
     // ✅ Calculate Time Status
-    let timeStatus = "-";
-    if (day === "sunday") {
-      timeStatus = "Full Time";
-    } else if (day === "saturday") {
-      timeStatus = totalHrs >= 5 ? "Full Time" : "Half Time";
-    } else {
-      timeStatus = totalHrs >= 7 ? "Full Time" : "Half Time";
-    }
+    // ✅ Calculate Time Status
+let timeStatus = "-";
+
+if (att.present) {
+  const day = (att.day || "").toLowerCase();
+
+  if (day === "sunday") {
+    timeStatus = "Full Time";
+  } else if (day === "saturday") {
+    timeStatus = totalHrs >= 5 ? "Full Time" : "Half Time";
+  } else {
+    timeStatus = totalHrs >= 7 ? "Full Time" : "Half Time";
+  }
+} else {
+  // ✅ Absent case
+  timeStatus = "-";
+}
 
     return (
       <tr key={`${att._id || idx}-${att.date}-${att.month}`}>
@@ -332,6 +421,7 @@ const [editOutTime, setEditOutTime] = useState("");
       setEditData(att);
       setEditInTime(att.attendanceIn || "");
       setEditOutTime(att.attendanceOut || "");
+      setEditPresent(att.present); // ✅ Add this line
       setShowModal(true);
     }}
   />
@@ -353,27 +443,81 @@ const [editOutTime, setEditOutTime] = useState("");
         )}
       </div>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+    <Modal show={showModal} onHide={() => setShowModal(false)} centered>
   <Modal.Header closeButton>
     <Modal.Title>Edit Attendance</Modal.Title>
   </Modal.Header>
+
   <Modal.Body>
     {editData && (
       <>
-        <p><b>Date:</b> {`${editData.date}/${editData.month}/${editData.year}`}</p>
-        <p><b>Day:</b> {editData.day}</p>
-        <p><b>Status:</b> {editData.present ? "Present" : "Absent"}</p>
-
+        {/* ✅ Editable Date */}
         <div className="form-group">
+          <label>Date</label>
+          <DatePicker
+            selected={
+              editData.date !== "-" && editData.year && editData.month
+                ? new Date(
+                    editData.year,
+                    editData.month - 1,
+                    editData.date
+                  )
+                : new Date()
+            }
+            onChange={(date) => {
+              const newDay = date.toLocaleDateString("en-US", {
+                weekday: "long",
+              });
+              setEditData({
+                ...editData,
+                date: date.getDate(),
+                month: date.getMonth() + 1,
+                year: date.getFullYear(),
+                day: newDay,
+              });
+            }}
+            dateFormat="dd/MM/yyyy"
+            className="form-control"
+          />
+        </div>
+
+        {/* ✅ Auto-updated Day */}
+        <div className="form-group mt-2">
+          <label>Day</label>
+          <input
+            type="text"
+            className="form-control"
+            value={editData.day || ""}
+            readOnly
+          />
+        </div>
+
+        {/* ✅ Attendance Status Dropdown */}
+        <div className="form-group mt-3">
+          <label>Attendance Status</label>
+          <select
+            className="form-control"
+            value={editPresent ? "true" : "false"}
+            onChange={(e) => setEditPresent(e.target.value === "true")}
+          >
+            <option value="true">Present</option>
+            <option value="false">Absent</option>
+          </select>
+        </div>
+
+        {/* ✅ In Time */}
+        <div className="form-group mt-3">
           <label>In Time</label>
           <input
             type="time"
             className="form-control"
             value={editInTime}
             onChange={(e) => setEditInTime(e.target.value)}
+            disabled={!editPresent}
           />
         </div>
 
+        {/* ✅ Out Time */}
         <div className="form-group mt-3">
           <label>Out Time</label>
           <input
@@ -381,48 +525,73 @@ const [editOutTime, setEditOutTime] = useState("");
             className="form-control"
             value={editOutTime}
             onChange={(e) => setEditOutTime(e.target.value)}
+            disabled={!editPresent}
           />
         </div>
       </>
     )}
   </Modal.Body>
+
   <Modal.Footer>
     <Button variant="secondary" onClick={() => setShowModal(false)}>
       Cancel
     </Button>
-    <Button
-      variant="primary"
-      onClick={async () => {
-        if (!editInTime || !editOutTime) {
-          return toast.error("Both In Time and Out Time are required!");
-        }
 
-        const obj = {
-          id: editData._id,
-          attendanceIn: editInTime,
-          attendanceOut: editOutTime,
-        };
+ <Button
+  variant="primary"
+  onClick={async () => {
+    if (editPresent && (!editInTime || !editOutTime)) {
+      return toast.error("Both In Time and Out Time are required!");
+    }
 
-        const res = await updateEmployeeAttendance(obj);
-        if (res.success) {
-          toast.success("Attendance updated successfully!");
-          setShowModal(false);
+    // 🚫 Prevent editing future date
+    const selectedDateObj = new Date(
+      editData.year,
+      editData.month - 1,
+      editData.date
+    );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDateObj > today) {
+      return toast.error("You cannot edit attendance for future dates!");
+    }
 
-          const refreshed = await getAttendance({
-            year: selectedMonthYear.getFullYear(),
-            month: selectedMonthYear.getMonth() + 1,
-          });
-          setAttendance(refreshed.data);
-        } else {
-          toast.error("Failed to update attendance");
-        }
-      }}
-    >
-      Save Changes
-    </Button>
+    const obj = {
+      id: editData._id || null,
+      employeeID: editData.employeeID,
+      date: editData.date,
+      month: editData.month,
+      year: editData.year,
+      day: editData.day,
+      attendanceIn: editInTime,
+      attendanceOut: editOutTime,
+      present: editPresent,
+    };
+
+    console.log("📤 Sending to backend:", obj);
+
+    const res = await updateEmployeeAttendance(obj);
+
+    if (res?.success) {
+      toast.success(res.message || "Attendance updated successfully!");
+      setShowModal(false);
+
+      // Refresh attendance
+      const refreshed = await getAttendance({
+        year: selectedMonthYear.getFullYear(),
+        month: selectedMonthYear.getMonth() + 1,
+      });
+      setAttendance(refreshed.data);
+    } else {
+      toast.error(res.message || "Failed to update attendance");
+    }
+  }}
+>
+  Save Changes
+</Button>
+
   </Modal.Footer>
 </Modal>
-
     </div>
   );
 };

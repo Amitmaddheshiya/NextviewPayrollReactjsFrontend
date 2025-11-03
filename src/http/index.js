@@ -14,6 +14,12 @@ export const forgotPassword = data => api.post('/auth/forgot',data);
 export const resetPassword = data => api.patch('/auth/reset',data);
 export const dLogout = () => api.get('/auth/logout');
 
+// Payroll Policies
+export const getPayrollPolicies = () => api.get('/admin/payroll-policies');
+export const updatePayrollPolicy = (id, data) => api.patch(`/admin/payroll-policies/${id}`, data);
+
+
+
 //Admin
 export const getCounts = () => api.get('/admin/counts');
 export const getEmployees = () => api.get('/admin/employees');

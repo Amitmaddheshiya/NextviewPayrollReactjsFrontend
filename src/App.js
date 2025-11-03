@@ -45,6 +45,8 @@ import AssignSalary from './components/Admin/AssignSalary';
 import Salaries from './components/Admin/Salaries';
 import MonthlySalaries from './components/Admin/MonthlySalaries';
 import SalaryView from './components/Admin/Salary';
+import PayrollPolicies from './components/Admin/PayrollPolicies';
+
 
 
 
@@ -152,6 +154,9 @@ const App = () =>
       <AdminRoute  path='/leaders'>
         <Leaders/>
       </AdminRoute>
+     <AdminRoute exact path='/payrollpolicies'>
+  <PayrollPolicies />
+</AdminRoute>
     </Switch>
   )
 }
