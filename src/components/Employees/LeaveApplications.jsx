@@ -77,6 +77,7 @@ const LeaveApplications = () => {
                                   <option>Sick Leave</option>
                                   <option>Casual Leave</option>
                                   <option>Emergency Leave</option>
+                                   <option>Earning Day Leave</option>
                               </select>
                           </div>
                           <div className="form-group col-md-2">

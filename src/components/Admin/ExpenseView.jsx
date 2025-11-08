@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getEmployees, getLeaders, viewLeaves, getAdmins } from "../../http";
+import {getEmployees, getLeaders, getAdmins, viewEmployeeExpenses, updateEmployeeExpense} from "../../http";
+
 import { useHistory } from "react-router-dom";
 import Loading from "../Loading";
 
-const LeaveView = () => {
+const ExpenseView = () => {
   const [type, setType] = useState("");
   const [status, setStatus] = useState("");
   const [appliedDate, setAppliedDate] = useState("");
-  const [applications, setApplications] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [employeeMap, setEmployeeMap] = useState({});
   const [selectedEmployee, setSelectedEmployee] = useState("");
@@ -18,12 +19,12 @@ const LeaveView = () => {
 
     const fetchData = async () => {
       try {
-        const res = await viewLeaves({});
+        const res = await viewEmployeeExpenses();
         const { data } = res || {};
-        setApplications(Array.isArray(data) ? data : []);
+        setExpenses(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Error fetching leave applications:", err);
-        setApplications([]);
+        console.error("Error fetching expenses:", err);
+        setExpenses([]);
       }
     };
 
@@ -32,7 +33,6 @@ const LeaveView = () => {
         const emps = await getEmployees();
         const leaders = await getLeaders();
         const admins = await getAdmins();
-       
 
         emps?.data?.forEach(
           (employee) => (empObj[employee.id] = [employee.name, employee.email])
@@ -56,20 +56,19 @@ const LeaveView = () => {
     fetchEmployees();
   }, []);
 
-  const searchLeaveApplications = async () => {
-    const obj = {};
-
-    if (selectedEmployee) obj["applicantID"] = selectedEmployee;
-    if (type) obj["type"] = type;
-    if (status) obj["adminResponse"] = status;
-    if (appliedDate) obj["appliedDate"] = appliedDate;
+  const searchExpenses = async () => {
+    const params = {};
+    if (selectedEmployee) params["employeeID"] = selectedEmployee;
+    if (type) params["type"] = type;
+    if (status) params["adminResponse"] = status;
+    if (appliedDate) params["appliedDate"] = appliedDate;
 
     try {
-      const res = await viewLeaves(obj);
+      const res = await viewEmployeeExpenses(params);
       const { data } = res || {};
-      setApplications(Array.isArray(data) ? data : []);
+      setExpenses(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Error searching leave applications:", err);
+      console.error("Error searching expenses:", err);
     }
 
     setAppliedDate("");
@@ -79,12 +78,12 @@ const LeaveView = () => {
 
   return (
     <>
-      {applications ? (
+      {expenses ? (
         <div className="main-content">
           <section className="section">
             <div className="card">
               <div className="card-header d-flex justify-content-between">
-                <h4>Leave Applications</h4>
+                <h4>Expense Applications</h4>
               </div>
             </div>
 
@@ -106,17 +105,17 @@ const LeaveView = () => {
               </div>
 
               <div className="form-group col-md-2">
-                <label>Leave Type</label>
+                <label>Expense Type</label>
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                   className="form-control select2"
                 >
                   <option value="">Select</option>
-                  <option>Sick Leave</option>
-                  <option>Casual Leave</option>
-                  <option>Emergency Leave</option>
-                   <option>Earning Day Leave</option>
+                  <option>Travel</option>
+                  <option>Food</option>
+                  <option>Office Supplies</option>
+                  <option>Other</option>
                 </select>
               </div>
 
@@ -136,28 +135,16 @@ const LeaveView = () => {
 
               <div className="form-group col-md-3">
                 <label>Applied Date</label>
-                <div className="input-group">
-                  <div className="input-group-prepend">
-                    <div className="input-group-text">
-                      <i className="fa fa-calendar"></i>
-                    </div>
-                  </div>
-                  <input
-                    onChange={(e) => setAppliedDate(e.target.value)}
-                    value={appliedDate}
-                    type="date"
-                    id="startDate"
-                    name="startDate"
-                    className="form-control"
-                  />
-                </div>
+                <input
+                  onChange={(e) => setAppliedDate(e.target.value)}
+                  value={appliedDate}
+                  type="date"
+                  className="form-control"
+                />
               </div>
 
               <div className="form-group col-md-2 d-flex align-items-end mt-4">
-                <button
-                  onClick={searchLeaveApplications}
-                  className="btn btn-lg btn-primary w-100"
-                >
+                <button onClick={searchExpenses} className="btn btn-lg btn-primary w-100">
                   Search
                 </button>
               </div>
@@ -172,40 +159,38 @@ const LeaveView = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Type</th>
-                  <th>Title</th>
+                  <th>Amount</th>
                   <th>Applied Date</th>
                   <th>Status</th>
                 </tr>
               </thead>
 
               <tbody className="sidebar-wrapper">
-                {applications.length > 0 ? (
-                  applications.map((application, idx) => {
-                    const empData = employeeMap?.[application.applicantID];
+                {expenses.length > 0 ? (
+                  expenses.map((expense, idx) => {
+                    const empData = employeeMap?.[expense.employeeID];
                     return (
                       <tr
-                        key={application._id || idx}
+                        key={expense._id || idx}
                         className="hover-effect"
-                        onClick={() =>
-                          history.push(`leaves/${application._id}`)
-                        }
+                        onClick={() => history.push(`/expenses/${expense._id}`)}
                       >
                         <td>{idx + 1}</td>
                         <td>{empData ? empData[0] : "N/A"}</td>
                         <td>{empData ? empData[1] : "N/A"}</td>
-                        <td>{application.type}</td>
-                        <td>{application.title}</td>
-                        <td>{application.appliedDate}</td>
+                        <td>{expense.type}</td>
+                        <td>₹{expense.amount}</td>
+                        <td>{expense.appliedDate}</td>
                         <td
                           className={`${
-                            application.adminResponse === "Rejected"
+                            expense.adminResponse === "Rejected"
                               ? "text-danger"
-                              : application.adminResponse === "Pending"
+                              : expense.adminResponse === "Pending"
                               ? "text-primary"
                               : "text-success"
                           }`}
                         >
-                          {application.adminResponse}
+                          {expense.adminResponse}
                         </td>
                       </tr>
                     );
@@ -213,7 +198,7 @@ const LeaveView = () => {
                 ) : (
                   <tr>
                     <td colSpan="7" className="text-center">
-                      No leave applications found.
+                      No expenses found.
                     </td>
                   </tr>
                 )}
@@ -228,4 +213,4 @@ const LeaveView = () => {
   );
 };
 
-export default LeaveView;
+export default ExpenseView;

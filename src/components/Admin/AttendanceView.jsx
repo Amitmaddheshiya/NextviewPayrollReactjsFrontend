@@ -72,12 +72,14 @@ useEffect(() => {
 
       setEmployeeMap(empObj);
       setEmployees(allEmployees);
+      setSelectedDate(new Date());
 
       // 🔹 Fetch attendance for current month
       const now = new Date();
       const obj = {
         year: now.getFullYear(),
         month: now.getMonth() + 1,
+        date: now.getDate(),
       };
 
       const res = await getAttendance(obj);
@@ -182,64 +184,94 @@ setAttendance(mergedData);
     }
   };
 
-  // ✅ Search attendance by month & year (for all employees or one)
-  const searchAttendanceByMonth = async () => {
-    if (!selectedMonthYear) {
-      alert("Please select a month & year!");
-      return;
-    }
 
-    setLoading(true);
-    setNoDataMessage("");
+  // ✅ Generate all dates for selected month until today
+const generateMonthDays = (year, month) => {
+  const days = [];
+  const today = new Date();
+  
+  const lastDate =
+    today.getFullYear() === year && today.getMonth() + 1 === month
+      ? today.getDate()
+      : new Date(year, month, 0).getDate();
 
-    const obj = {
-      year: selectedMonthYear.getFullYear(),
-      month: selectedMonthYear.getMonth() + 1,
-    };
-
-    if (selectedEmployee) obj.employeeID = selectedEmployee; // ✅ Add employee filter
-
-    try {
-      const res = await getAttendance(obj);
-      const data = res?.data || [];
-// 🔹 Generate virtual "absent" records
-let mergedData = [...data];
-
-employees.forEach(emp => {
-  const hasRecord = data.some(a => a.employeeID === emp.id);
-  if (!hasRecord) {
-    mergedData.push({
-      employeeID: emp.id,
-      date: obj.date || "-",
-      month: obj.month,
-      year: obj.year,
-      day: "-",
-      present: false,
-      attendanceIn: "-",
-      attendanceOut: "-",
-      totalHours: "-",
-      late: "-",
-      timeStatus: "-",
+  for (let i = 1; i <= lastDate; i++) {
+    days.push({
+      date: i,
+      month,
+      year,
+      day: new Date(year, month - 1, i).toLocaleDateString("en-US", {
+        weekday: "long",
+      }),
     });
   }
-});
 
-setAttendance(mergedData);
+  return days.reverse(); // ✅ latest day on top
+};
 
- 
-      setNoDataMessage(
-        data.length === 0
-          ? "No attendance records found for this month."
-          : ""
-      );
-    } catch (error) {
-      console.error("Error fetching monthly attendance:", error);
-      setNoDataMessage("Error fetching monthly attendance.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // ✅ Search attendance by month & year (for all employees or one)
+ const searchAttendanceByMonth = async () => {
+  if (!selectedMonthYear) {
+    alert("Please select a month & year!");
+    return;
+  }
 
+  setLoading(true);
+  setNoDataMessage("");
+
+  const year = selectedMonthYear.getFullYear();
+  const month = selectedMonthYear.getMonth() + 1;
+
+  try {
+    // 🔹 Step 1: fetch all attendance for that month
+    const res = await getAttendance({ year, month });
+    const records = res?.data || [];
+
+    // 🔹 Step 2: Generate all days from 1 to today
+    const monthDays = generateMonthDays(year, month);
+
+    const finalList = [];
+
+    // 🔹 Step 3: For each day, add all employees (present + absent)
+    monthDays.forEach((d) => {
+      employees.forEach((emp) => {
+        const found = records.find(
+          (a) =>
+            a.employeeID === emp.id &&
+            a.date === d.date &&
+            a.month === d.month &&
+            a.year === d.year
+        );
+
+        if (found) {
+          finalList.push({ ...found });
+        } else {
+          finalList.push({
+            employeeID: emp.id,
+            date: d.date,
+            month: d.month,
+            year: d.year,
+            day: d.day,
+            present: false,
+            attendanceIn: "-",
+            attendanceOut: "-",
+            totalHours: "-",
+            late: "-",
+            timeStatus: "-",
+          });
+        }
+      });
+    });
+
+    setAttendance(finalList);
+  } catch (error) {
+    console.error("Error fetching monthly attendance:", error);
+    setNoDataMessage("Error fetching monthly attendance.");
+  } finally {
+    setLoading(false);
+  }
+};
+  
   
   if (loading) return <Loading />;
 
@@ -464,18 +496,30 @@ if (att.present) {
                   )
                 : new Date()
             }
-            onChange={(date) => {
-              const newDay = date.toLocaleDateString("en-US", {
-                weekday: "long",
-              });
-              setEditData({
-                ...editData,
-                date: date.getDate(),
-                month: date.getMonth() + 1,
-                year: date.getFullYear(),
-                day: newDay,
-              });
-            }}
+           onChange={(date) => {
+  const newDay = date.toLocaleDateString("en-US", { weekday: "long" });
+
+  // 🧩 Update date & day
+  setEditData((prev) => ({
+    ...prev,
+    date: date.getDate(),
+    month: date.getMonth() + 1,
+    year: date.getFullYear(),
+    day: newDay,
+  }));
+
+  // 🧩 If Sunday — auto mark Present and set fixed In/Out times
+  if (newDay === "Sunday") {
+    setEditPresent(true);
+    setEditInTime("10:30");
+    setEditOutTime("19:30");
+  } else {
+    // Keep user’s existing status & clear times if previously Sunday
+    setEditPresent((prev) => prev);
+    setEditInTime("");
+    setEditOutTime("");
+  }
+}}
             dateFormat="dd/MM/yyyy"
             className="form-control"
           />

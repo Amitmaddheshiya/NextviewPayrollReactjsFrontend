@@ -4,6 +4,7 @@ import {
   checkInEmployeeAttendance,
   checkOutEmployeeAttendance,
   viewEmployeeAttendance,
+  markEmployeeAttendance
 } from "../../http";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -12,7 +13,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const OFFICE_LAT = 23.0361925;
 const OFFICE_LNG = 72.5133962;
-const ALLOWED_DISTANCE = 30000; // in kilometers (≈200 meters)
+const ALLOWED_DISTANCE = 0.1; // in kilometers (≈200 meters)
 
 const Attendance = () => {
   const { user } = useSelector((state) => state.authSlice);
@@ -73,57 +74,127 @@ const Attendance = () => {
 
   // --- Fetch attendance data ---
   useEffect(() => {
-    const fetchData = async () => {
-      const dt = new Date();
+  const fetchData = async () => {
+    const dt = new Date();
+    const dayName = dt.toLocaleDateString("en-US", { weekday: "long" });
+
+    // 🔹 Auto-mark attendance for ALL employees if today is Sunday
+    if (dayName === "Sunday") {
       const obj = {
         employeeID: user.id,
         year: dt.getFullYear(),
         month: dt.getMonth() + 1,
+        date: dt.getDate(),
+        day: "Sunday",
+        present: true,
+        attendanceIn: "10:30",
+        attendanceOut: "19:30",
+        totalHours: "9:00",
       };
-      const res = await viewEmployeeAttendance(obj);
-      setAttendance(res.data);
 
-      const today = res.data?.find(
-        (a) =>
-          a.date === dt.getDate() &&
-          a.month === dt.getMonth() + 1 &&
-          a.year === dt.getFullYear()
-      );
-      if (today) {
-        if (today.attendanceIn) setIsCheckedIn(true);
-        if (today.attendanceOut) setIsCheckedOut(true);
+      try {
+        const res = await markEmployeeAttendance(obj);
+        if (res.success) {
+          toast.info("✅ Sunday auto-marked: 10:30 AM - 7:30 PM");
+          setIsCheckedIn(true);
+          setIsCheckedOut(true);
+        }
+      } catch (err) {
+        console.error("Sunday auto-mark error:", err);
       }
+    }
+
+    // 🔹 Normal fetch attendance for this month
+    const obj = {
+      employeeID: user.id,
+      year: dt.getFullYear(),
+      month: dt.getMonth() + 1,
     };
 
-    fetchData();
-    checkLocation();
-  }, [user.id]);
+    const res = await viewEmployeeAttendance(obj);
+    setAttendance(res.data);
+
+    // 🔹 Check if today's attendance already exists
+    const today = res.data?.find(
+      (a) =>
+        a.date === dt.getDate() &&
+        a.month === dt.getMonth() + 1 &&
+        a.year === dt.getFullYear()
+    );
+
+    if (today) {
+      if (today.attendanceIn) setIsCheckedIn(true);
+      if (today.attendanceOut) setIsCheckedOut(true);
+    }
+  };
+
+  fetchData();
+  checkLocation();
+}, [user.id]);
+
+
+  // const handleCheckIn = async () => {
+  //   if (user.workType === "Onsite" && !isNearOffice) {
+  //     toast.error("You must be at the office to check in!");
+  //     return;
+  //   }
+
+  //   const res = await checkInEmployeeAttendance({ employeeID: user.id });
+  //   if (res.success) {
+  //     toast.success(res.message);
+  //     setIsCheckedIn(true);
+  //   } else toast.error(res.message);
+  // };
 
   const handleCheckIn = async () => {
-    if (user.workType === "Onsite" && !isNearOffice) {
-      toast.error("You must be at the office to check in!");
-      return;
-    }
+  if (new Date().getDay() === 0) {
+    toast.error("Today is Sunday — attendance not allowed");
+    return;
+  }
 
-    const res = await checkInEmployeeAttendance({ employeeID: user.id });
-    if (res.success) {
-      toast.success(res.message);
-      setIsCheckedIn(true);
-    } else toast.error(res.message);
-  };
+  if (user.workType === "Onsite" && !isNearOffice) {
+    toast.error("You must be at the office to check in!");
+    return;
+  }
 
-  const handleCheckOut = async () => {
-    if (user.workType === "Onsite" && !isNearOffice) {
-      toast.error("You must be at the office to check out!");
-      return;
-    }
+  const res = await checkInEmployeeAttendance({ employeeID: user.id });
+  if (res.success) {
+    toast.success(res.message);
+    setIsCheckedIn(true);
+  } else toast.error(res.message);
+};
 
-    const res = await checkOutEmployeeAttendance({ employeeID: user.id });
-    if (res.success) {
-      toast.success(res.message);
-      setIsCheckedOut(true);
-    } else toast.error(res.message);
-  };
+const handleCheckOut = async () => {
+  if (new Date().getDay() === 0) {
+    toast.error("Today is Sunday — attendance not allowed");
+    return;
+  }
+
+  if (user.workType === "Onsite" && !isNearOffice) {
+    toast.error("You must be at the office to check out!");
+    return;
+  }
+
+  const res = await checkOutEmployeeAttendance({ employeeID: user.id });
+  if (res.success) {
+    toast.success(res.message);
+    setIsCheckedOut(true);
+  } else toast.error(res.message);
+};
+
+
+  // const handleCheckOut = async () => {
+  //   if (user.workType === "Onsite" && !isNearOffice) {
+  //     toast.error("You must be at the office to check out!");
+  //     return;
+  //   }
+
+  //   const res = await checkOutEmployeeAttendance({ employeeID: user.id });
+  //   if (res.success) {
+  //     toast.success(res.message);
+  //     setIsCheckedOut(true);
+  //   } else toast.error(res.message);
+  // };
 
   return (
     <>
@@ -134,22 +205,22 @@ const Attendance = () => {
               <h4 className="text-white">Attendance</h4>
               <div>
                 {!isCheckedIn ? (
-                  <button
-                    className="btn btn-success"
-                    onClick={handleCheckIn}
-                    disabled={user.workType === "Onsite" && !isNearOffice}
-                  >
-                    Check In
-                  </button>
+               <button
+  className="btn btn-success"
+  onClick={handleCheckIn}
+>
+  Check In
+</button>
+
                 ) : !isCheckedOut ? (
-                  <button
-                    className="btn btn-danger"
-                    onClick={handleCheckOut}
-                    disabled={user.workType === "Onsite" && !isNearOffice}
-                  >
-                    Check Out
-                  </button>
-                ) : (
+               <button
+  className="btn btn-danger"
+  onClick={handleCheckOut}
+>
+  Check Out
+</button>
+
+ ) : (
                   <button className="btn btn-secondary" onClick={() => {
                     toast.info("Attendance for today is already marked.");
                   }}>

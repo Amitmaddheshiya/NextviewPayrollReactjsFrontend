@@ -53,6 +53,16 @@ export const deleteUser = (id) => api.delete(`/admin/user/${id}`);
 export const deleteTeam = (id) => api.delete(`/admin/team/${id}`);
 export const updateEmployeeAttendance = (data) => api.post('admin/update-employee-attendance', data);
 
+// 💰 admin Expense APIs
+export const viewEmployeeExpenses = (params) =>api.get("/admin/expenses", { params });
+export const getExpenseById_Admin = (id) =>api.get(`/admin/expenses/${id}`);
+export const updateEmployeeExpense = (id, data) =>api.patch(`/admin/expenses/${id}`, data);
+
+export const calculateCurrentMonthSalaries = () =>
+  api.get("/admin/calculate-current-month-salaries");
+
+
+
 
 //Leader
 export const getMembers_Leader = () => api.get('/leader/team/members');
@@ -67,12 +77,19 @@ export const viewEmployeeAttendance = data => api.post('/employee/view-employee-
 export const applyforleave = data => api.post('/employee/apply-leave-application',data);
 export const viewLeaveApplications = data  => api.post('/employee/view-leave-applications',data);
 export const viewEmployeeSalary = data => api.post('employee/view-salary',data);
+//export const viewExpenseApplications = data => api.post('/employee/view-expense-applications', data);
 export const checkInEmployeeAttendance = data => api.post('/employee/checkin-employee-attendance', data);
 export const checkOutEmployeeAttendance = data => api.post('/employee/checkout-employee-attendance', data);
-
-
-
+//  Admin - All Users
 export const getAllUsers = () => api.get('/admin/all-users');
+// 💰 Expenses
+// 💰 Employee Expense APIs
+export const getEmployeeExpenses = (params) =>api.get("/employee/expenses", { params });
+export const addExpense = (data) =>api.post("/employee/expenses", data);
+export const updateExpense = (id, data) =>api.patch(`/employee/expenses/${id}`, data);
+export const deleteExpense = (id) =>api.delete(`/employee/expenses/${id}`);
+export const getExpenseById = (id) =>api.get(`/employee/expenses/${id}`);
+
 
 
 api.interceptors.response.use((response)=>{

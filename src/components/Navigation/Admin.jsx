@@ -25,6 +25,7 @@ const dispatch = useDispatch();
         <li><NavLink className="nav-link" to="/teams"><i className="fas fa-fire"></i> <span>Teams</span></NavLink></li>
         <li><NavLink className="nav-link" to="/attendance"><i className="fas fa-user"></i> <span>Attendance</span></NavLink></li>
         <li><NavLink className="nav-link" to="/leaves"><i className="fas fa-book"></i><span>Leaves</span></NavLink></li>
+        <li><NavLink className="nav-link" to="/expenses"><i className="fas fa-file-invoice-dollar"></i> <span>Expenses</span></NavLink></li>
         <li><NavLink className="nav-link" to="/assignSalary"><i class="fas fa-pen"></i> <span>Assign Salary</span></NavLink></li>
         <li><NavLink className="nav-link" to="/salaries"><i class="fas fa-piggy-bank"></i> <span>Salaries</span></NavLink></li>
         <li><NavLink className="nav-link" to="/monthlysalaries"><i class="fas fa-piggy-bank"></i> <span>Monthly Salaries</span></NavLink></li>

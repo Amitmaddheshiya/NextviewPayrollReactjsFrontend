@@ -27,6 +27,8 @@ const Employee = () =>
         <li><NavLink className="nav-link" to="/applyforleave"><i className="fas fa-pen"></i> <span>Apply For Leave</span></NavLink></li>
         <li><NavLink className="nav-link" to="/userLeaveApplications"><i className="fas fa-book"></i> <span>Leave Applications</span></NavLink></li>
         <li><NavLink className="nav-link" to="/userSalary"><i class="fas fa-piggy-bank"></i> <span>Salary</span></NavLink></li>
+        <li><NavLink className="nav-link" to="/expenseForm"><i className="fas fa-file-invoice-dollar"></i> <span>Submit Expense</span></NavLink></li>
+      
 
         <li className="menu-header">Settings</li>
         <li><NavLink className="nav-link" to="/contact"><i className="fab fa-teamspeak"></i> <span>Contact me</span></NavLink></li>

@@ -46,8 +46,10 @@ const ApplyForLeave = () =>
         const {success} = res;
         console.log(res)
         if(success) {
-          toast.success("Leave Application Sent!");
-        }    
+          toast.success('Leave applied successfully');
+        } else {
+          toast.error('Error applying for leave');
+        }     
 
         setFormData(initialState);
     }
@@ -80,6 +82,7 @@ const ApplyForLeave = () =>
                                 <option>Sick Leave</option>
                                 <option>Casual Leave</option>
                                 <option>Emergency Leave</option>
+                                 <option>Earning Day Leave</option>
                             </select>
                         </div>
                         <div className="form-group col-md-4">

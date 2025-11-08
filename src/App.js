@@ -46,7 +46,9 @@ import Salaries from './components/Admin/Salaries';
 import MonthlySalaries from './components/Admin/MonthlySalaries';
 import SalaryView from './components/Admin/Salary';
 import PayrollPolicies from './components/Admin/PayrollPolicies';
-
+import ExpenseForm from './components/Employees/ExpenseForm';
+import ExpenseView from './components/Admin/ExpenseView';
+import Expense from './components/Admin/Expense';
 
 
 
@@ -85,6 +87,9 @@ const App = () =>
       <EmployeeRoute exact path='/userLeaveApplications/:id'>
         <LeaveApplication/>
       </EmployeeRoute>
+      <EmployeeRoute exact path='/expenseForm'>
+      <ExpenseForm/>
+      </EmployeeRoute>
       <GuestRoute exact path='/' >
         <Login/>
       </GuestRoute>
@@ -117,6 +122,12 @@ const App = () =>
       </AdminRoute>
       <AdminRoute exact path='/leaves'>
         <LeaveView/>
+      </AdminRoute>
+      <AdminRoute exact path='/expenses'>
+        <ExpenseView/>
+      </AdminRoute>
+      <AdminRoute exact path='/expenses/:id'>
+        <Expense/>
       </AdminRoute>
       <AdminRoute exact path='/assignSalary'>
         <AssignSalary/>

@@ -21,8 +21,8 @@ const AssignSalary = () => {
     reasonForBonus: "",
     pfEmployeePercent: "12",
     pfEmployerPercent: "12",
-    esiEmployeePercent: "1.75",
-    esiEmployerPercent: "4.75",
+    esiEmployeePercent: "0", // ✅ default 0
+    esiEmployerPercent: "0", // ✅ default 0
     professionalTax: "0",
     loanRecovery: "0",
     tdsMonthlyOverride: "",
@@ -85,13 +85,13 @@ const AssignSalary = () => {
   const loanRecovery = n(formData.loanRecovery);
 
   const calculateAnnualTDSFromSlabs = (annualTaxable) => {
-   const slabs = [
-    { upto: 1200000, rate: 0 },     // Up to ₹12 lakh → 0%
-    { upto: 1600000, rate: 0.15 },  // ₹12–16 lakh → 15%
-    { upto: 2000000, rate: 0.20 },  // ₹16–20 lakh → 20%
-    { upto: 2400000, rate: 0.25 },  // ₹20–24 lakh → 25%
-    { upto: Infinity, rate: 0.30 }, // ₹24 lakh+ → 30%
-  ];
+    const slabs = [
+      { upto: 1200000, rate: 0 },
+      { upto: 1600000, rate: 0.15 },
+      { upto: 2000000, rate: 0.2 },
+      { upto: 2400000, rate: 0.25 },
+      { upto: Infinity, rate: 0.3 },
+    ];
     let remaining = annualTaxable;
     let tax = 0;
     let lower = 0;
@@ -130,7 +130,6 @@ const AssignSalary = () => {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  // ===== Submit Function =====
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedEmployee) {
@@ -203,6 +202,7 @@ const AssignSalary = () => {
       <div className="container my-4">
         <section className="card p-3">
           <form onSubmit={handleSubmit}>
+            {/* Employee selection */}
             <div className="row">
               <div className="col-md-6">
                 <label>Select Employee</label>
@@ -221,25 +221,17 @@ const AssignSalary = () => {
               </div>
 
               <div className="col-md-6">
-  <div className="d-flex flex-column">
-    <label className="mb-1 fw-semibold">Select Date (Day / Month / Year)</label>
-    <DatePicker
-      selected={selectedDate}
-      onChange={(date) => setSelectedDate(date)}
-      dateFormat="dd/MM/yyyy"
-      className="form-control"
-      placeholderText="Select Date"
-      showMonthDropdown
-      showYearDropdown
-      dropdownMode="select"
-      popperPlacement="bottom-start"
-    />
-  </div>
-</div>
-
+                <label>Select Date</label>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  className="form-control"
+                />
+              </div>
             </div>
 
-            {/* EARNINGS SECTION */}
+            {/* Earnings Inputs */}
             <h5 className="mt-3">Earnings</h5>
             <div className="row">
               {[
@@ -265,7 +257,7 @@ const AssignSalary = () => {
               ))}
             </div>
 
-            {/* DEDUCTIONS SECTION */}
+            {/* Deductions Inputs */}
             <h5 className="mt-3">Deductions & Contributions</h5>
             <div className="row">
               {[
@@ -298,35 +290,35 @@ const AssignSalary = () => {
               </div>
             </div>
 
-            {/* PREVIEW SECTION */}
+            {/* Detailed Preview */}
             <div className="row mt-3">
-              <div className="col-md-6">
+              <div className="col-md-8">
                 <div className="card p-3">
-                  <h6>Preview</h6>
+                  <h6>💰 Salary Breakdown</h6>
                   <table className="table table-sm">
                     <tbody>
-                      <tr>
-                        <td>Gross Earnings</td>
-                        <td>₹ {grossEarnings.toFixed(2)}</td>
-                      </tr>
-                      <tr>
-                        <td>Total Deductions</td>
-                        <td>₹ {totalDeductions.toFixed(2)}</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <strong>Net Pay</strong>
-                        </td>
-                        <td>
-                          <strong>₹ {netPay.toFixed(2)}</strong>
-                        </td>
-                      </tr>
+                      <tr><td>Basic</td><td>₹ {n(formData.basic)}</td></tr>
+                      <tr><td>HRA</td><td>₹ {n(formData.hra)}</td></tr>
+                      <tr><td>Conveyance</td><td>₹ {n(formData.conveyance)}</td></tr>
+                      <tr><td>Medical</td><td>₹ {n(formData.medical)}</td></tr>
+                      <tr><td>Special Allowance</td><td>₹ {n(formData.specialAllowance)}</td></tr>
+                      <tr><td>Bonus</td><td>₹ {n(formData.bonus)}</td></tr>
+                      <tr><td>Overtime Pay</td><td>₹ {overtimePay}</td></tr>
+                      <tr><td>Other Benefits</td><td>₹ {n(formData.otherBenefits)}</td></tr>
+                      <tr className="table-success"><td><strong>Gross Earnings</strong></td><td><strong>₹ {grossEarnings.toFixed(2)}</strong></td></tr>
+                      <tr><td>PF (Employee)</td><td>- ₹ {pfEmployee.toFixed(2)}</td></tr>
+                      <tr><td>ESI (Employee)</td><td>- ₹ {esiEmployee.toFixed(2)}</td></tr>
+                      <tr><td>Professional Tax</td><td>- ₹ {professionalTax.toFixed(2)}</td></tr>
+                      <tr><td>Loan Recovery</td><td>- ₹ {loanRecovery.toFixed(2)}</td></tr>
+                      <tr><td>TDS</td><td>- ₹ {monthlyTDS.toFixed(2)}</td></tr>
+                      <tr className="table-warning"><td><strong>Total Deductions</strong></td><td><strong>₹ {totalDeductions.toFixed(2)}</strong></td></tr>
+                      <tr className="table-primary"><td><strong>Net Pay (In-Hand)</strong></td><td><strong>₹ {netPay.toFixed(2)}</strong></td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <div className="col-md-6 d-flex align-items-end justify-content-end">
+              <div className="col-md-4 d-flex align-items-end justify-content-end">
                 <div>
                   <button
                     className="btn btn-secondary me-2"
