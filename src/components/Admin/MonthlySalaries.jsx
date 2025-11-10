@@ -31,9 +31,9 @@ const MonthlySalaries = () => {
   return (
     <>
       <HeaderSection title="Current Month Salaries" />
-      <div className="container my-4">
-        <section className="card p-3">
-          <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="container  my-4 border border-black">
+        <section className=" card p-3">
+          <div className="d-flex justify-content-between align-items-center mb-3 w-100">
             <h5>Current Month Salary Report</h5>
             <button className="btn btn-sm btn-outline-primary" onClick={fetchSalaries}>
               Refresh
@@ -48,12 +48,13 @@ const MonthlySalaries = () => {
     <th>Email</th>
     <th>Month/Year</th>
     <th>Gross (₹)</th>
-    <th>Per Day Salary (₹)</th>
     <th>PF (₹)</th>
     <th>ESI (₹)</th>
     <th>TDS (₹)</th>
     <th>Other Deductions (₹)</th>
     <th>Monthly Net Pay (₹)</th>
+     <th>Per Day Salary (₹)</th>
+       <th>Total Present Days</th> {/* ✅ New Column */}
     <th>Till Date Salary (₹)</th>
     <th>Approved Expense (₹)</th>
     <th>Total Pay (₹)</th>
@@ -68,12 +69,13 @@ const MonthlySalaries = () => {
         <td>{r.email}</td>
         <td>{`${r.month}/${r.year}`}</td>
         <td>{r.earnings?.gross?.toFixed(2) || "0.00"}</td>
-        <td>{r.perDaySalary?.toFixed(2) || "0.00"}</td>
         <td>{r.deductions?.pfEmployee?.toFixed(2) || "0.00"}</td>
         <td>{r.deductions?.esiEmployee?.toFixed(2) || "0.00"}</td>
         <td>{r.deductions?.tdsMonthly?.toFixed(2) || "0.00"}</td>
         <td>{r.deductions?.professionalTax?.toFixed(2) || "0.00"}</td>
         <td className="fw-bold text-primary">{r.netPay?.toFixed(2) || "0.00"}</td>
+         <td>{r.perDaySalary?.toFixed(2) || "0.00"}</td>
+         <td className="fw-bold text-info">{r.presentDays || 0}</td> {/* ✅ Show Present Days */}
         <td className="fw-bold text-warning">{r.tillDateSalary?.toFixed(2) || "0.00"}</td>
         <td>{r.totalExpenses?.toFixed(2) || "0.00"}</td>
         <td className="fw-bold text-success">{r.totalPay?.toFixed(2) || "0.00"}</td>

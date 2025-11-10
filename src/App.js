@@ -236,29 +236,29 @@ const AdminRoute = ({children,...rest}) =>
   );
 }
 
-const AdminLeaderRouter = ({children,...rest}) =>
-{
-  const {user} = useSelector((state)=>state.authSlice);
-  return (
-    <Route {...rest} render={({location})=>{
-      return user && (user.type==='Admin' || user.type==='Leader') ? (
-        <>
-          <SideBar/>
-          <Navigation/>
-          {children}
-        </>) : (
-        <Redirect
-          to={{
-            pathname:'/',
-            state:{
-              from:location
-            }
-          }}
-        />
-      );
-    }} />
-  );
-}
+// const AdminLeaderRouter = ({children,...rest}) =>
+// {
+//   const {user} = useSelector((state)=>state.authSlice);
+//   return (
+//     <Route {...rest} render={({location})=>{
+//       return user && (user.type==='Admin' || user.type==='Leader') ? (
+//         <>
+//           <SideBar/>
+//           <Navigation/>
+//           {children}
+//         </>) : (
+//         <Redirect
+//           to={{
+//             pathname:'/',
+//             state:{
+//               from:location
+//             }
+//           }}
+//         />
+//       );
+//     }} />
+//   );
+// }
 
 
 const LeaderRoute = ({children,...rest}) =>

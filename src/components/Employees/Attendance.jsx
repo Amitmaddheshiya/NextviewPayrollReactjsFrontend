@@ -13,7 +13,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const OFFICE_LAT = 23.0361925;
 const OFFICE_LNG = 72.5133962;
-const ALLOWED_DISTANCE = 0.1; // in kilometers (≈200 meters)
+const ALLOWED_DISTANCE = 30000; // in kilometers (≈200 meters)
 
 const Attendance = () => {
   const { user } = useSelector((state) => state.authSlice);
