@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getExpenseById_Admin, updateEmployeeExpense, viewEmployeeExpenses } from "../../http";
+import { getExpenseById_Admin, updateEmployeeExpense } from "../../http";
 import { toast } from "react-toastify";
 import Loading from "../Loading";
 
@@ -8,11 +8,7 @@ const Expense = () => {
   const { id } = useParams();
   const [expense, setExpense] = useState();
 
-  useEffect(() => {
-    fetchExpense();
-  }, [id]);
-
-  const fetchExpense = async () => {
+   const fetchExpense = async () => {
   try {
     const res = await getExpenseById_Admin(id);
     setExpense(res?.expense || {});
@@ -22,6 +18,9 @@ const Expense = () => {
   }
 };
 
+  useEffect(() => {
+    fetchExpense();
+  }, [id]);
 
 
   const approveExpense = async () => {

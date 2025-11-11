@@ -201,7 +201,7 @@ const SalaryView = () => {
   if (loading || !salary) return <Loading />;
 
   const emp = salary.employeeID;
-  const { deductions } = salary;
+  
 
   // ===========================
   // RENDER SECTION

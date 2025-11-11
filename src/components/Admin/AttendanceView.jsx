@@ -388,9 +388,6 @@ const generateMonthDays = (year, month) => {
         ? parseFloat(rawTotal)
         : Number(rawTotal);
 
-    const day = (att.day || "").toLowerCase();
-
-    // ✅ Calculate Time Status
     // ✅ Calculate Time Status
 let timeStatus = "-";
 

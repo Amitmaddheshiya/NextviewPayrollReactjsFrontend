@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {getEmployees, getLeaders, getAdmins, viewEmployeeExpenses, updateEmployeeExpense} from "../../http";
+import {getEmployees, getLeaders, getAdmins, viewEmployeeExpenses} from "../../http";
 
 import { useHistory } from "react-router-dom";
 import Loading from "../Loading";

@@ -2,8 +2,6 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import HeaderSection from "../../components/HeaderSection";
 import { applyforleave } from "../../http";
-import Modal from '../../components/modal/Modal';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 

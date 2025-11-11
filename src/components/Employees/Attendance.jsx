@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
 import {
   checkInEmployeeAttendance,
   checkOutEmployeeAttendance,
@@ -131,7 +130,6 @@ const Attendance = () => {
   fetchData();
   checkLocation();
 }, [user.id]);
-
 
   // const handleCheckIn = async () => {
   //   if (user.workType === "Onsite" && !isNearOffice) {

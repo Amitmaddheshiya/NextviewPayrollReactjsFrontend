@@ -23,7 +23,7 @@ const Leave = () => {
         }
         fetchData();
 
-    },[application]);
+    },[id]);
 
     const approveApplication = async() => {
       console.log(application)
