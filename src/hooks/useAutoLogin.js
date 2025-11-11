@@ -12,9 +12,10 @@ export const useAutoLogin = () =>
         (async()=>
         {
             try{
-                const res = await axios.get(`${process.env.REACT_APP_BASE_URL}/api/auth/refresh`,{
-                    withCredentials:true,
-                });
+               const base = process.env.REACT_APP_BASE_URL?.replace(/\/+$/, ''); // remove trailing slashes
+const res = await axios.get(`${base}/api/auth/refresh`, {
+  withCredentials: true,
+});
                 if(res.status===200)
                 {
                     if(res.data.success)

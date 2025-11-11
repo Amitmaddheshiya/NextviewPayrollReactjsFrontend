@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const base = process.env.REACT_APP_BASE_URL?.replace(/\/+$/, '');
 const api = axios.create({
-    baseURL:`${process.env.REACT_APP_BASE_URL}/api`,
-    withCredentials:true
-})
+  baseURL: `${base}/api`,
+  withCredentials: true
+});
+
 
 // 'http://localhost:5500/api'
 
