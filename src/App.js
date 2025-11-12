@@ -285,30 +285,28 @@ const LeaderRoute = ({children,...rest}) =>
   );
 }
 
-const EmployeeRoute = ({ children, ...rest }) => {
-  const { user } = useSelector((state) => state.authSlice);
+const EmployeeRoute = ({children,...rest}) =>
+{
+  const {user} = useSelector((state)=>state.authSlice);
   return (
-    <Route
-      {...rest}
-      render={({ location }) => {
-        return (user && (user.type === 'Employee' || user.type === 'Leader')) ? (
-          <>
-            <SideBar />
-            <Navigation />
-            {children}
-          </>
-        ) : (
-          <Redirect
-            to={{
-              pathname: '/',
-              state: { from: location }
-            }}
-          />
-        );
-      }}
-    />
+    <Route {...rest} render={({location})=>{
+      return user && user.type==='Employee' || user.type==='Leader' ? (
+        <>
+          <SideBar/>
+          <Navigation/>
+          {children}
+        </>) : (
+        <Redirect
+          to={{
+            pathname:'/',
+            state:{
+              from:location
+            }
+          }}
+        />
+      );
+    }} />
   );
-};
-
+}
 
 export default App;

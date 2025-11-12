@@ -8,6 +8,10 @@ import { setAuth } from "../store/auth-slice";
 
 const Navigation = () =>
 {
+ const toggleSidebar = () => {
+  document.body.classList.toggle("sidebar-open");
+};
+
     const {name,image} = useSelector((state)=>state.authSlice.user);
     const dispatch = useDispatch();
     const history = useHistory();
@@ -26,7 +30,23 @@ const Navigation = () =>
             <nav className="navbar navbar-expand-lg main-navbar">
                 <form className="form-inline mr-auto">
                 <ul className="navbar-nav mr-3">
-                    <li><NavLink to='/' id='sidebarCollapse' data-toggle="sidebar" className="nav-link nav-link-lg"><i className="fas fa-bars"></i></NavLink></li>
+                    {/* ✅ Sidebar toggle button */}
+            <li>
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                className="nav-link nav-link-lg"
+                id="sidebarToggle"
+                style={{
+                  background: "none",
+                  border: "none",
+                  outline: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <i className="fas fa-bars"></i>
+              </button>
+            </li>
                     <li><NavLink to='/' data-toggle="search" className="nav-link nav-link-lg d-sm-none"><i className="fas fa-search"></i></NavLink></li>
                 </ul>
                 <div className="search-element">

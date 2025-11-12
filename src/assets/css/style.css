@@ -2990,16 +2990,105 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
   scrollbar-color: #999 #f0f0f0;
 }
 
-/* Optional: prettier scrollbar for Chrome / Edge */
+/* ✅ Scrollbar for Sidebar */
+.custom-sidebar {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #999 #f0f0f0;
+}
 .custom-sidebar::-webkit-scrollbar {
   width: 6px;
 }
-
 .custom-sidebar::-webkit-scrollbar-thumb {
   background-color: #999;
   border-radius: 4px;
 }
-
 .custom-sidebar::-webkit-scrollbar-thumb:hover {
   background-color: #666;
+}
+
+/* ✅ Sidebar Base */
+.main-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background: #fff;
+  z-index: 1050;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* ✅ Default visible on large screens */
+@media (min-width: 1441px) {
+  .main-sidebar {
+    transform: translateX(0);
+    width:260px;
+  }
+}
+
+/* ✅ Hidden by default on smaller screens */
+@media (max-width: 1440px) {
+  .main-sidebar {
+    transform: translateX(-100%);
+    
+  }
+
+  body.sidebar-open .main-sidebar {
+    transform: translateX(0);
+     position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background: #fff;
+  z-index: 1050;
+  transition: transform 0.3s ease-in-out;
+  }
+
+  /* ✅ Overlay visible only when sidebar open */
+  .sidebar-overlay {
+    display: none;
+     
+  }
+
+  body.sidebar-open .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+   
+  }
+}
+
+
+/* ✅ Close Sidebar Button - clean and fixed position */
+.close-sidebar-btn {
+  position: fixed;           /* viewport ke respect me position */
+  top: -4px;                 /* thoda niche */
+  right: 8px;               /* screen ke right corner me */
+  background: transparent;   /* no background */
+  border: none;              /* no border */
+  outline: none;             /* no focus outline */
+  font-size: 26px;           /* thoda bada icon */
+  cursor: pointer;
+  color: #333;               /* icon color */
+  z-index: 1101;             /* overlay aur sidebar ke upar */
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* Hover effect (optional) */
+.close-sidebar-btn:hover {
+  color: #007bff;            /* blue hover */
+  transform: scale(1.2);
+}
+
+/* Show only on smaller screens */
+@media (min-width: 1441px) {
+  .close-sidebar-btn {
+    display: none;
+  }
 }
